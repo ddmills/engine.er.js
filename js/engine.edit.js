@@ -235,7 +235,7 @@ $(document).on('click', '#add-layer-confirm', function() {
 
 layer_edit_form_set = function(name) {
     var lay = window.edit.layers[name];
-    $('#layer-edit-form-title').html("<span class='glyphicon glyphicon-file'></span>Edit Layer: " + name);
+    $('#layer-edit-form-title').html("<span class='glyphicon glyphicon-file'></span>edit layer: " + name);
     $('#layer-edit-form-name').val(name);
     $('#layer-edit-form-name').data('lay_name', name);
     if (lay.overlay) {
@@ -332,7 +332,7 @@ engine_editor = function() {
             return false;
         } else {
             var html = "<div class='layer-view' id='layer-view-" + name + "'>" +
-                "<h4 class='title-layer-edit' id='title-layer-edit-" + name +  "'>" + name + "</h4>" +
+                "<p class='title-layer-edit' id='title-layer-edit-" + name +  "'>" + name + "</p>" +
                 "<div class='btn-group layer-controls'>" +
                     "<button type='button' class='btn btn-default btn-xs btn-layer-vis' id='btn-layer-vis-"+ name +"'><span class='glyphicon glyphicon-eye-open'></span></button>" +
                     "<button type='button' class='btn btn-default btn-xs btn-layer-edit' id='btn-layer-edit-"+ name +"'><span class='glyphicon glyphicon-pencil'></span></button>" +
