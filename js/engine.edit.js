@@ -23,12 +23,30 @@ if (!Array.prototype.filter) {
         return res;
     };
 }
-View_Layer = function(name, overlay, persistant, order) {
+View_Layer = function(name, overlay, persistant, order, width, height) {
     this.name = name;
     this.overlay = overlay;
     this.persistant = persistant;
     this.order = order;
     this.visible = true;
+    
+    this.height = height;
+    this.width = width;
+    
+    this.x = 100;
+    this.y = 100;
+    
+    this.ele_container_div = $("<div class='editor-layer-container' id='editor-layer-container-"+this.name+"'><p class='editor-layer-text'>" + this.name + "</div>");
+    this.ele_content_div = $("<div class='editor-layer-contents' id='layer-contents-'"+this.name+"'></div>");
+    
+    this.ele_content_div.css('height', this.height + 'px');
+    this.ele_content_div.css('width', this.width + 'px');
+    
+    this.ele_container_div.css('left', this.x + 'px');
+    this.ele_container_div.css('top', this.y + 'px');
+    
+    this.ele_container_div.append(this.ele_content_div);
+    $('#editor-grid').append(this.ele_container_div);
 }
 View_Layer.prototype.move_up = function() {
     if (this.order != 0) {
@@ -77,7 +95,7 @@ $(window).ready(function() {
     
     
     for (var i = 0; i < 6; i++) {
-        window.edit.add_layer('layer_' + i, false, false);
+       //window.edit.add_layer('layer_' + i, false, false);
     }
 });
 $(document).on('keyup', '.int-only', function () { 
@@ -190,11 +208,17 @@ $(document).on('click', '#view-layer-add', function() {
 
 $(document).on('click', '.layer-view', function() {
     $('.layer-view-selected').removeClass('layer-view-selected');
+    $('.editor-layer-container-selected').removeClass('editor-layer-container-selected');
+    
+    var name = $(this).children('p').html();
+    $('#editor-layer-container-' + name).addClass('editor-layer-container-selected');
     $(this).addClass('layer-view-selected');
 });
 
 layer_add_form_clear = function() {
-    $('#layer-add-form-name').val('');
+    $('#layer-add-form-name').val('layer_' + window.edit.layer_order.length);
+    $('#layer-add-form-width').val('500');
+    $('#layer-add-form-height').val('300');
     $('span', $('#uniform-layer-add-form-overlay')).removeClass('checked');
     $('span', $('#uniform-layer-add-form-persistant')).removeClass('checked');
     $('#layer-add-form-overlay').removeAttr('checked');
@@ -209,25 +233,27 @@ $(document).on('click', '#add-layer-confirm', function() {
     var name = $('#layer-add-form-name').val();
     var overlay = $('#layer-add-form-overlay').prop('checked');
     var persistant =$('#layer-add-form-persistant').prop('checked');
+    var width = $('#layer-add-form-width').val();
+    var height = $('#layer-add-form-height').val();
     if (name == '') {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
-            "The layer requires a name." +
+            "the layer requires a name" +
         "</div>";
         $('#layer-add-err').html(html);
     } else if (name.indexOf(' ') != -1) {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
-            "The layer name cannot contain spaces." +
+            "the layer name cannot contain spaces" +
         "</div>";
         $('#layer-add-err').html(html);
-    } else if (window.edit.add_layer(name, overlay, persistant)) {
+    } else if (window.edit.add_layer(name, overlay, persistant, width, height)) {
        $('#shelf-layer-add').hide();
        $('#shelf-layer-view').show();
     } else {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
-            "A layer already exists with that name." +
+            "a layer already exists with that name" +
         "</div>";
         $('#layer-add-err').html(html);
     }
@@ -237,6 +263,8 @@ layer_edit_form_set = function(name) {
     var lay = window.edit.layers[name];
     $('#layer-edit-form-title').html("<span class='glyphicon glyphicon-file'></span>edit layer: " + name);
     $('#layer-edit-form-name').val(name);
+    $('#layer-edit-form-width').val(lay.width);
+    $('#layer-edit-form-height').val(lay.height);
     $('#layer-edit-form-name').data('lay_name', name);
     if (lay.overlay) {
         $('span', $('#uniform-layer-edit-form-overlay')).addClass('checked');
@@ -274,6 +302,8 @@ $(document).on('click', '#edit-layer-confirm', function() {
     var name = $('#layer-edit-form-name').val();
     var overlay = $('#layer-edit-form-overlay').prop('checked');
     var persistant =$('#layer-edit-form-persistant').prop('checked');
+    var width = $('#layer-edit-form-width').val();
+    var height = $('#layer-edit-form-height').val();
     if (name == '') {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
@@ -294,10 +324,12 @@ $(document).on('click', '#edit-layer-confirm', function() {
         delete window.edit.layers[old_name];
         layer.overlay = overlay;
         layer.persistant = persistant;
+        layer.width = width;
+        layer.height = height;
         window.edit.layer_order[layer.order] = name;
         var html = "<div class='alert alert-success alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
-            "Layer edit confirmed." +
+            "layer " + name + " updated." +
         "</div>";
         $('#layer-view-notify').html(html);
         $('#shelf-layer-edit').hide();
@@ -313,9 +345,11 @@ $(document).on('click', '#edit-layer-confirm', function() {
     } else {
         window.edit.layers[name].overlay = overlay;
         window.edit.layers[name].persistant = persistant;
+        window.edit.layers[name].height = height;
+        window.edit.layers[name].width = width;
         var html = "<div class='alert alert-success alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
-            "Layer edit confirmed." +
+            "layer " + name + " updated." +
         "</div>";
         $('#layer-view-notify').html(html);
         $('#shelf-layer-edit').hide();
@@ -325,9 +359,10 @@ $(document).on('click', '#edit-layer-confirm', function() {
 });
 
 engine_editor = function() {
+    this.selected_layer = null;
     this.layers = {};
     this.layer_order = [];
-    this.add_layer = function(name, overlay, persistant) {
+    this.add_layer = function(name, overlay, persistant, width, height) {
         if (this.layers[name]) {
             return false;
         } else {
@@ -341,7 +376,7 @@ engine_editor = function() {
                     "<button type='button' class='btn btn-default btn-xs btn-layer-down' id='btn-layer-down-"+ name +"'><span class='glyphicon glyphicon-chevron-down'></span></button>" +
                 "</div>" +
             "</div>";
-            this.layers[name] = new View_Layer(name, overlay, persistant, this.layer_order.length);
+            this.layers[name] = new View_Layer(name, overlay, persistant, this.layer_order.length, width, height);
             this.layer_order.push(name);
             $('#layer-list').append(html);
             return true;
