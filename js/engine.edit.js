@@ -3,6 +3,7 @@ View_Layer = function(name, overlay, persistant, order) {
     this.overlay = overlay;
     this.persistant = persistant;
     this.order = order;
+    this.visible = true;
 }
 View_Layer.prototype.move_up = function() {
     if (this.order != 0) {
@@ -29,27 +30,60 @@ View_Layer.prototype.set_name = function(new_name) {
     $('#btn-layer-down-' + this.name).attr('id', 'btn-layer-down-' + new_name);
     this.name = new_name;
 }
+View_Layer.prototype.set_visibility = function(visibility) {
+    this.visible = visibility;
+    console.log('set visibility of layer ' + name + ' to ' + visibility);
+}
 
 $(window).ready(function() {
     window.edit = new engine_editor();
     $('#shelf-layer-add').hide();
     $('#shelf-layer-edit').hide();
-    $('#shelf-settings').hide();
-    draw_grid(32, 32, 'grey');
+    $('#shelf-settings-grid').hide();
+    
+    //$('.active').show(600);
+    var act_id = $('.active').attr('id');
+    console.log('#shelf-' + act_id.substr(5, act_id.length));
+    $('#shelf-' + act_id.substr(5, act_id.length)).show();
+    draw_grid(16, 16, '#073763', '#cfe2f3');
+    $('.input-color').simpleColorPicker({ colorsPerLine: 16 });
+});
+$(document).on('keyup', '.int-only', function () { 
+    this.value = this.value.replace(/[^0-9\.]/g,'');
 });
 
+$(document).on('click', '#btn-settings-grid', function() {
+    $('#shelf-settings-all').hide();
+    $('#shelf-settings-grid').show();
+});
 $(document).on('click', '#grid-settings-confirm', function() {
     var w = $('#settings-grid-width').val();
     var h = $('#settings-grid-height').val();
     var c = $('#settings-grid-color').val();
-    draw_grid(w, h, c);
+    var b = $('#settings-bkg-color').val();
+    draw_grid(w, h, c, b);
+    var html = "<div class='alert alert-success alert-dismissable'>" +
+        "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
+        "grid settings changed" +
+    "</div>";
+    $('#settings-all-notify').html(html);
+    $('#shelf-settings-grid').hide();
+    $('#shelf-settings-all').show();
 });
-draw_grid = function(w, h, color) {
+$(document).on('click', '#grid-settings-cancel', function() {
+    $('#settings-grid-width').val();
+    $('#settings-grid-height').val();
+    $('#settings-grid-color').val();
+    $('#settings-bkg-color').val();
+    $('#shelf-settings-grid').hide();
+    $('#shelf-settings-all').show();
+});
+draw_grid = function(w, h, grid_color, bkg_color) {
     var can = $('#canvas-create-grid');
     var ctx = can[0].getContext('2d');
     can.attr('width', w);
     can.attr('height', h);
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = grid_color;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(w, 0);
@@ -57,7 +91,9 @@ draw_grid = function(w, h, color) {
     ctx.lineTo(0, h);
     ctx.stroke();
     var dataURL = can[0].toDataURL();
+    $('#editor-grid').css('background', bkg_color);
     $('#editor-grid').css('background-image', 'url(' + dataURL +')');
+    
 }
 
 $(document).on('click', '.navtab', function() {
@@ -69,8 +105,8 @@ $(document).on('click', '.navtab', function() {
         $(this).addClass('active');
         var cur_id = $(this).attr('id');
         var cur = cur_id.substr(5, cur_id.length);
-        $('#shelf-'+old).hide(250);
-        $('#shelf-'+cur).show(250);
+        $('#shelf-' + old).hide(400);
+        $('#shelf-' + cur).show(400);
     }
 });
 
@@ -80,6 +116,19 @@ $(document).on('click', '.btn-layer-edit', function() {
     layer_edit_form_set(name);
     $('#shelf-layer-view').hide();
     $('#shelf-layer-edit').show();
+});
+$(document).on('click', '.btn-layer-vis', function() {
+    var id = $(this).attr('id');
+    var name = id.substr(14, id.length);
+    var lay = window.edit.layers[name];
+    if (lay.visible) {
+        var html = "<span class='glyphicon glyphicon-eye-close'></span>";
+        lay.set_visibility(false);
+    } else {
+        var html = "<span class='glyphicon glyphicon-eye-open'></span>";
+        lay.set_visibility(true);
+    }
+    $(this).html(html);
 });
 $(document).on('click', '.btn-layer-up', function() {
     var id = $(this).attr('id');
@@ -253,6 +302,7 @@ engine_editor = function() {
             var html = "<div class='layer-view' id='layer-view-" + name + "'>" +
                 "<h4 class='title-layer-edit' id='title-layer-edit-" + name +  "'>" + name + "</h4>" +
                 "<div class='btn-group layer-controls'>" +
+                    "<button type='button' class='btn btn-default btn-xs btn-layer-vis' id='btn-layer-vis-"+ name +"'><span class='glyphicon glyphicon-eye-open'></span></button>" +
                     "<button type='button' class='btn btn-default btn-xs btn-layer-edit' id='btn-layer-edit-"+ name +"'><span class='glyphicon glyphicon-pencil'></span></button>" +
                     "<button type='button' class='btn btn-default btn-xs btn-layer-delete' id='btn-layer-delete-"+ name +"'><span class='glyphicon glyphicon-trash'></span></button>" +
                     "<button type='button' class='btn btn-default btn-xs btn-layer-up' id='btn-layer-up-"+ name +"'><span class='glyphicon glyphicon-chevron-up'></span></button>" +

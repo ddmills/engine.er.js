@@ -150,3 +150,11 @@ h2 {
 #shelf-entities {
     display:none;
 }
+#grid-settings-form {
+    max-width: 200px;
+    left: 20px;
+}
+.shelf-main {
+    padding: 15px;
+    display: none;
+}

@@ -6,11 +6,13 @@
     <!-- scripts -->
     <script src='./js/jquery.min.js'></script>
     <script src='./js/bootstrap.min.js'></script>
+    <script src='./js/simple-color-picker.min.js'></script>
     <script src='./engine.er.js'></script>
     <script src='./js/engine.edit.js'></script>
     
     <!-- stylesheets -->
     <link href='css/bootstrap.min.css' rel='stylesheet'>
+    <link href='css/simple-color-picker.css' rel='stylesheet'>
     <link href='css/engine.edit.css' rel='stylesheet'>
     
 </head>
@@ -43,96 +45,111 @@
                         <li class='navtab' id='goto-entities'><a><span class='glyphicon glyphicon-heart'></span> entities</a></li>
                         <li class='navtab' id='goto-settings'><a><span class='glyphicon glyphicon-wrench'></span> settings</a></li>
                     </ul>
-                    <div id='shelf-layers'>
+                    <div id='shelf-layers' class='shelf-main'>
                         <div id='shelf-layer-view'>
-                            <h4> layers </h4>
+                            <h4> layer list </h4>
                             <div id='layer-view-err'></div>
                             <div id='layer-view-notify'></div>
                             <div class='panel' id='layer-list'></div>
                             <button type='button' class='btn btn-default' id='view-layer-add'>
-                                <span class='glyphicon glyphicon-plus'></span> Add Layer
+                                <span class='glyphicon glyphicon-plus'></span> add layer
                             </button>
                         </div>
                         <div id='shelf-layer-add'>  
-                            <h4><span class='glyphicon glyphicon-file'></span> Add New Layer </h4>
+                            <h4><span class='glyphicon glyphicon-file'></span> new layer </h4>
                             <div id='layer-add-err'></div>
                             <div class='form-group'>
-                                <label for='layer-add-form-name'>Layer Name</label>
-                                <input type='text' class='form-control' id='layer-add-form-name' placeholder='Enter name'>
+                                <label for='layer-add-form-name'>name</label>
+                                <input type='text' class='form-control' id='layer-add-form-name' placeholder='name'>
                                 
                                 <div class='checkbox'>
                                     <label>
-                                        <input type='checkbox' id='layer-add-form-overlay'>Overlay
-                                        <p class='help-block'>Layer is full size</p>
+                                        <input type='checkbox' id='layer-add-form-overlay'>overlay
+                                        <p class='help-block'>layer is full size</p>
                                     </label>
                                 </div>
                                 
                                 <div class='checkbox'>
                                     <label>
-                                        <input type='checkbox' id='layer-add-form-persistant'>Refreshed
-                                        <p class='help-block'>Layer is cleared whenever it's dirty.</p>
+                                        <input type='checkbox' id='layer-add-form-persistant'>refreshed
+                                        <p class='help-block'>layer is cleared whenever it's dirty</p>
                                     </label>
                                 </div>
                                 
                                 <button type='button' class='btn btn-default' id='add-layer-cancel'>
-                                    <span class='glyphicon glyphicon-remove'></span> Cancel
+                                    <span class='glyphicon glyphicon-remove'></span> cancel
                                 </button>
                                 <button type='button' class='btn btn-default' id='add-layer-confirm'>
-                                    <span class='glyphicon glyphicon-ok'></span> Add
+                                    <span class='glyphicon glyphicon-ok'></span> add
                                 </button>
                             </div>
                         </div>
                         <div id='shelf-layer-edit'>
-                        <h4 id='layer-edit-form-title'><span class='glyphicon glyphicon-file'></span>Edit Layer</h4>
+                        <h4 id='layer-edit-form-title'><span class='glyphicon glyphicon-file'></span>edit layer</h4>
                         <div id='layer-edit-err'></div>
                         <div class='form-group'>
-                            <label for='layer-edit-form-name'>Layer Name</label>
+                            <label for='layer-edit-form-name'>name</label>
                             <input type='text' class='form-control' id='layer-edit-form-name' placeholder='Enter name'>
                             
                             <div class='checkbox'>
                                 <label>
-                                    <input type='checkbox' id='layer-edit-form-overlay'>Overlay
-                                    <p class='help-block'>Layer is full size</p>
+                                    <input type='checkbox' id='layer-edit-form-overlay'>overlay
+                                    <p class='help-block'>layer is full size</p>
                                 </label>
                             </div>
                             
                             <div class='checkbox'>
                                 <label>
-                                    <input type='checkbox' id='layer-edit-form-persistant'>Refreshed
-                                    <p class='help-block'>Layer is cleared whenever it's dirty.</p>
+                                    <input type='checkbox' id='layer-edit-form-persistant'>refreshed
+                                    <p class='help-block'>layer is cleared whenever it's dirty</p>
                                 </label>
                             </div>
                             
                             <button type='button' class='btn btn-default' id='edit-layer-cancel'>
-                                <span class='glyphicon glyphicon-remove'></span> Cancel
+                                <span class='glyphicon glyphicon-remove'></span> cancel
                             </button>
                             <button type='button' class='btn btn-default' id='edit-layer-confirm'>
-                                <span class='glyphicon glyphicon-ok'></span> Confirm
-                            </button>
-                        </div>
-                    </div>
-                    </div>
-                    <div id='shelf-viewport'>
-                        <h3> viewwwporrtttt </h3>
-                    </div>
-                    <div id='shelf-entities'>
-                        <h3> monsters </h3>
-                    </div>
-                    <div id='shelf-settings'>
-                        <canvas id='canvas-create-grid'></canvas>
-                        <div class='form-group'>
-                            <label for='settings-grid-width'>width</label>
-                            <input type='text' class='form-control' id='settings-grid-width' placeholder='width'>
-                            <br>
-                            <label for='settings-grid-height'>height</label>
-                            <input type='text' class='form-control' id='settings-grid-height' placeholder='height'>
-                            <label for='settings-grid-color'>color</label>
-                            <input type='text' class='form-control' id='settings-grid-color' placeholder='color'>
-                            <button type='button' class='btn btn-default' id='grid-settings-confirm'>
                                 <span class='glyphicon glyphicon-ok'></span> confirm
                             </button>
                         </div>
                     </div>
+                    </div>
+                    <div id='shelf-viewport' class='shelf-main'>
+                        <h3> viewwwporrtttt </h3>
+                    </div>
+                    <div id='shelf-entities' class='shelf-main'>
+                        <h3> monsters </h3>
+                    </div>
+                    <div id='shelf-settings' class='shelf-main'>
+                        <div id='shelf-settings-all'>
+                            <div id='settings-all-notify'></div>
+                            <button type='button' class='btn btn-default' id='btn-settings-grid'>
+                                <span class='glyphicon glyphicon-th-large'></span> grid settings
+                            </button>
+                            <button type='button' class='btn btn-default' id='btn-settings-other'>
+                                <span class='glyphicon glyphicon-cog'></span> other settings
+                            </button>
+                        </div>
+                        <div id='shelf-settings-grid'>
+                            <canvas id='canvas-create-grid'></canvas>
+                            <h4> editor grid settings </h4>
+                            <div class='form-group' id='grid-settings-form'>
+                                <label for='settings-grid-width'>width</label>
+                                <input type='text' class='form-control int-only' id='settings-grid-width' value='16'>
+                                <label for='settings-grid-height'>height</label>
+                                <input type='text' class='form-control int-only' id='settings-grid-height' value='16'>
+                                <label for='settings-grid-color'>grid color</label>
+                                <input type='text' class='form-control input-color' id='settings-grid-color' value='#073763'>
+                                <label for='settings-bkg-color'>background color</label>
+                                <input type='text' class='form-control input-color' id='settings-bkg-color' value='#cfe2f3'>
+                            </div>
+                            <button type='button' class='btn btn-default' id='grid-settings-cancel'>
+                                <span class='glyphicon glyphicon-remove'></span> cancel
+                            </button>
+                            <button type='button' class='btn btn-default' id='grid-settings-confirm'>
+                                <span class='glyphicon glyphicon-ok'></span> confirm
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
