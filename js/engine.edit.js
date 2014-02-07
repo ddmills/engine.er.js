@@ -1,3 +1,28 @@
+if (!Array.prototype.filter) {
+    Array.prototype.filter = function(fun /*, thisp */) {   
+        "use strict";
+
+        if (this === void 0 || this === null)
+            throw new TypeError();
+
+        var t = Object(this);
+        var len = t.length >>> 0;
+        if (typeof fun !== "function")
+            throw new TypeError();
+
+        var res = [];
+        var thisp = arguments[1];
+        for (var i = 0; i < len; i++) {
+            if (i in t) {
+                var val = t[i]; // in case fun mutates this
+                if (fun.call(thisp, val, i, t))
+                res.push(val);
+            }
+        }
+
+        return res;
+    };
+}
 View_Layer = function(name, overlay, persistant, order) {
     this.name = name;
     this.overlay = overlay;
@@ -14,8 +39,12 @@ View_Layer.prototype.move_up = function() {
     }
 }
 View_Layer.prototype.move_down = function() {
+    console.log(this.order + 1);
+    console.log(window.edit.layer_order);
     if (this.order != window.edit.layer_order.length - 1) {
-        var below = window.edit.layer_order[this.order + 1];
+        var below = window.edit.layer_order[this.order +1];
+        console.log(this.order);
+        console.log(window.edit.layer_order[4]);
         if (below != undefined) {
             window.edit.swap_layers(below, this.name, this.name);
         }
@@ -40,13 +69,16 @@ $(window).ready(function() {
     $('#shelf-layer-add').hide();
     $('#shelf-layer-edit').hide();
     $('#shelf-settings-grid').hide();
-    
-    //$('.active').show(600);
+
     var act_id = $('.active').attr('id');
-    console.log('#shelf-' + act_id.substr(5, act_id.length));
     $('#shelf-' + act_id.substr(5, act_id.length)).show();
     draw_grid(16, 16, '#073763', '#cfe2f3');
     $('.input-color').simpleColorPicker({ colorsPerLine: 16 });
+    
+    
+    for (var i = 0; i < 6; i++) {
+        window.edit.add_layer('layer_' + i, false, false);
+    }
 });
 $(document).on('keyup', '.int-only', function () { 
     this.value = this.value.replace(/[^0-9\.]/g,'');
@@ -319,6 +351,14 @@ engine_editor = function() {
         $('#layer-view-' + name).remove();
         delete this.layer_order[this.layers[name].order];
         delete this.layers[name];
+        this.layer_order = this.layer_order.filter(function (item) { return item != undefined });
+        for (var i = 0; i < this.layer_order.length; i++) {
+            console.log(i + ' ' + this.layer_order[i]);
+            this.layers[this.layer_order[i]].order = i;
+            
+        }
+        //console.log(this.layers);
+        //console.log(this.layer_order);
     }
     this.swap_layers = function(name_1, name_2, collapse) {
         var l1 = this.layers[name_1];
