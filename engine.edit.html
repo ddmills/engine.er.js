@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <title>engine.er.js editor</title>
+    
+    <!-- scripts -->
+    <script src='./js/jquery.min.js'></script>
+    <script src='./js/bootstrap.min.js'></script>
+    <script src='./engine.er.js'></script>
+    <script src='./js/engine.edit.js'></script>
+    
+    <!-- stylesheets -->
+    <link href='css/bootstrap.min.css' rel='stylesheet'>
+    <link href='css/engine.edit.css' rel='stylesheet'>
+    
+</head>
+<body>
+    <div id='area-container'>
+        <div id='area-top'>
+            <div id='area-header'>
+                <h4 id='main-header'>engine.er: <strong>filename.js</strong></h4>
+                <div class='btn-group btn-group-xs' id='file-controls'>
+                    <button type='button' class='btn btn-default'>load<span class='glyphicon glyphicon-open'></span></button>
+                    <button type='button' class='btn btn-default'>save<span class='glyphicon glyphicon-save'></span></button>
+                </div>
+                <div class='btn-group btn-group-xs' id='game-controls'>
+                    <button type='button' class='btn btn-default'><span class='glyphicon glyphicon-play'></span></button>
+                    <button type='button' class='btn btn-default'><span class='glyphicon glyphicon-pause'></span></button>
+                    <button type='button' class='btn btn-default'><span class='glyphicon glyphicon-stop'></span></button>
+                </div>
+            </div>
+        </div>
+        <div id='area-bottom'>
+            <div id='area-left'>
+                <div id='editor-grid'>
+                </div>             
+            </div>
+            <div id='area-right'> 
+                <div id='area-shelf'>
+                    <ul class='nav nav-tabs'>
+                        <li class='navtab' id='goto-viewport'><a><span class='glyphicon glyphicon-camera'></span> viewport</a></li>
+                        <li class='navtab active' id='goto-layers'><a><span class='glyphicon glyphicon-file'></span> layers</a></li>
+                        <li class='navtab' id='goto-entities'><a><span class='glyphicon glyphicon-heart'></span> entities</a></li>
+                        <li class='navtab' id='goto-settings'><a><span class='glyphicon glyphicon-wrench'></span> settings</a></li>
+                    </ul>
+                    <div id='shelf-layers'>
+                        <div id='shelf-layer-view'>
+                            <h4> layers </h4>
+                            <div id='layer-view-err'></div>
+                            <div id='layer-view-notify'></div>
+                            <div class='panel' id='layer-list'></div>
+                            <button type='button' class='btn btn-default' id='view-layer-add'>
+                                <span class='glyphicon glyphicon-plus'></span> Add Layer
+                            </button>
+                        </div>
+                        <div id='shelf-layer-add'>  
+                            <h4><span class='glyphicon glyphicon-file'></span> Add New Layer </h4>
+                            <div id='layer-add-err'></div>
+                            <div class='form-group'>
+                                <label for='layer-add-form-name'>Layer Name</label>
+                                <input type='text' class='form-control' id='layer-add-form-name' placeholder='Enter name'>
+                                
+                                <div class='checkbox'>
+                                    <label>
+                                        <input type='checkbox' id='layer-add-form-overlay'>Overlay
+                                        <p class='help-block'>Layer is full size</p>
+                                    </label>
+                                </div>
+                                
+                                <div class='checkbox'>
+                                    <label>
+                                        <input type='checkbox' id='layer-add-form-persistant'>Refreshed
+                                        <p class='help-block'>Layer is cleared whenever it's dirty.</p>
+                                    </label>
+                                </div>
+                                
+                                <button type='button' class='btn btn-default' id='add-layer-cancel'>
+                                    <span class='glyphicon glyphicon-remove'></span> Cancel
+                                </button>
+                                <button type='button' class='btn btn-default' id='add-layer-confirm'>
+                                    <span class='glyphicon glyphicon-ok'></span> Add
+                                </button>
+                            </div>
+                        </div>
+                        <div id='shelf-layer-edit'>
+                        <h4 id='layer-edit-form-title'><span class='glyphicon glyphicon-file'></span>Edit Layer</h4>
+                        <div id='layer-edit-err'></div>
+                        <div class='form-group'>
+                            <label for='layer-edit-form-name'>Layer Name</label>
+                            <input type='text' class='form-control' id='layer-edit-form-name' placeholder='Enter name'>
+                            
+                            <div class='checkbox'>
+                                <label>
+                                    <input type='checkbox' id='layer-edit-form-overlay'>Overlay
+                                    <p class='help-block'>Layer is full size</p>
+                                </label>
+                            </div>
+                            
+                            <div class='checkbox'>
+                                <label>
+                                    <input type='checkbox' id='layer-edit-form-persistant'>Refreshed
+                                    <p class='help-block'>Layer is cleared whenever it's dirty.</p>
+                                </label>
+                            </div>
+                            
+                            <button type='button' class='btn btn-default' id='edit-layer-cancel'>
+                                <span class='glyphicon glyphicon-remove'></span> Cancel
+                            </button>
+                            <button type='button' class='btn btn-default' id='edit-layer-confirm'>
+                                <span class='glyphicon glyphicon-ok'></span> Confirm
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+                    <div id='shelf-viewport'>
+                        <h3> viewwwporrtttt </h3>
+                    </div>
+                    <div id='shelf-entities'>
+                        <h3> monsters </h3>
+                    </div>
+                    <div id='shelf-settings'>
+                        <canvas id='canvas-create-grid'></canvas>
+                        <div class='form-group'>
+                            <label for='settings-grid-width'>width</label>
+                            <input type='text' class='form-control' id='settings-grid-width' placeholder='width'>
+                            <br>
+                            <label for='settings-grid-height'>height</label>
+                            <input type='text' class='form-control' id='settings-grid-height' placeholder='height'>
+                            <label for='settings-grid-color'>color</label>
+                            <input type='text' class='form-control' id='settings-grid-color' placeholder='color'>
+                            <button type='button' class='btn btn-default' id='grid-settings-confirm'>
+                                <span class='glyphicon glyphicon-ok'></span> confirm
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,152 @@
+html {
+    height: 100%;
+}
+body {
+    width: 100%;
+    height: 100%;
+    
+    padding: 0px;
+    margin: 0 auto;
+}
+#area-container {
+    height: 100%;
+   
+    padding-top: 35px;
+}
+#area-top {
+    position: absolute;
+    
+    width: 100%;
+    height: 35px;
+    
+    margin-top: -35px;
+    padding: 2px;
+    border-bottom: 1px solid black;
+    background: #D1D1D1;
+    
+}
+#area-bottom {
+    position: relative;
+    float: left;
+    
+    width: 100%;
+    height: 100%;
+}
+#area-left {
+    position: relative;
+    float: left;
+    
+    width: 70%;
+    height: 100%;
+    
+    background: #1A1A1A;
+}
+#editor-grid {
+    width: 100%;
+    height: 100%;
+
+    background-image: null;
+    background-repeat: repeat;
+
+    /*clip: rect(16px, 0px, 0px, 16px);*/
+
+}
+#area-right {
+    position: relative;
+    float: left;
+    
+    width: 30%;
+    height: 100%;
+    border-left: 1px solid black;
+    padding: 20px;
+}
+#main-header {
+    display: inline;
+    margin: 0;
+    padding-left: 5px;
+}
+#area-header {
+    float: left;
+    height: 100%;
+    width : 100%;
+    padding: 5px;
+}
+#area-shelf {
+    height : 100%;
+    width : 100%;
+    padding: 0px;
+}
+#game-controls {
+    position: relative;
+    margin-right: 40px;
+    top: 0px;
+    float: right;
+}   
+#file-controls {
+    position: relative;
+    margin-right: 20px;
+    top: 0px;
+    float: right;
+}
+.panel {
+
+}
+h2 {
+    margin: 0;
+    padding: 0px;
+}
+#layer-list {
+    width: 100%;
+    min-height: 50px;
+    max-height: 250px;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    overflow-y: scroll;
+    overflow-x: hide;
+    background: grey;
+    padding: 8px;
+}
+.layer-view {
+    border: 1px solid black;
+    border-radius: 5px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding: 5px;
+    width: 100%;
+    background: white;
+    overflow: hidden;
+    position: relative;
+}
+.layer-controls {
+    float: right;
+}
+.layer-view-selected {
+    background: #E6E6E6;
+    border: 2px solid #4C86C1;
+}
+.title-layer-edit {
+    margin: 2px;
+    float: left;
+}
+.navtab {
+    cursor: pointer;
+    padding: 0px;
+}
+.navtabs {
+    margin-bottom: 0;
+}
+.nav>li>a {
+    padding: 3px;
+}
+#canvas-create-grid {
+    display: none;
+}
+#shelf-settings {
+    display: none;
+}
+#shelf-viewport {
+    display: none;
+}
+#shelf-entities {
+    display:none;
+}
