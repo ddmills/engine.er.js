@@ -33,8 +33,9 @@ body {
     
     width: 80%;
     height: 100%;
-    overflow: auto;
     
+    overflow: auto;
+    padding: 0px;
     background: #1A1A1A;
 }
 #area-top {
@@ -52,10 +53,8 @@ body {
 
 /* editor layers */
 .editor-layer-container {
-
     outline: 2px solid grey;
     position: absolute;
-    
 }
 .editor-layer-container-selected {
     box-shadow: 0px 0px 5px 3px #4C86C1;
@@ -64,35 +63,29 @@ body {
     position: relative;
     width: 100%;
     height: 100%;
-    background: black;
-    opacity: .5;
 }
 .editor-layer-text {
     position: absolute;
     left: 4px;
     top: 4px;
     color: grey;
-    z-index: 100;
     display: hidden;
 }
 
+#editor {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
 /* edit window */
-#area-left-floater {
-    float: left;
-    height: 50%;
-    margin-bottom: -240px;
-}
-#editor-viewport-centered {
-    position: relative;
-    clear: left;
-    margin: 0 auto;
-}
 #editor-viewport {
     box-shadow: 0px 0px 2px 2px grey;
+    display: block;
     position: relative;
     width: 640px;
     height: 480px;
-    margin: 0 auto;
     background: black;
     background-image: null;
     background-repeat: repeat;

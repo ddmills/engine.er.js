@@ -34,9 +34,8 @@
         </div>
         <div id='area-bottom'>
             <div id='area-left'>
-                <div id='area-left-floater'></div>
-                <div id='editor-viewport-centered'>
-                    <div id='editor-viewport'></div>
+                <div id='editor'>
+                <div id='editor-viewport'></div>
                 </div>
             </div>
             <div id='area-right'> 
@@ -69,10 +68,16 @@
                                 <input type='text' class='form-control' id='layer-add-form-name' value='name'>
                                 
                                 <label for='layer-add-form-width'>width</label>
-                                <input type='text' class='form-control int-only' id='layer-add-form-width' value='500'>
+                                <input type='text' class='form-control pos-int-only' id='layer-add-form-width' value='500'>
                                 
                                 <label for='layer-add-form-height'>height</label>
-                                <input type='text' class='form-control int-only' id='layer-add-form-height' value='300'>
+                                <input type='text' class='form-control pos-int-only' id='layer-add-form-height' value='300'>
+                                
+                                <label for='layer-add-form-left'>left</label>
+                                <input type='text' class='form-control int-only' id='layer-add-form-left' value='0'>
+                                
+                                <label for='layer-add-form-top'>top</label>
+                                <input type='text' class='form-control int-only' id='layer-add-form-top' value='0'>
                                 
                                 <div class='checkbox'>
                                     <label>

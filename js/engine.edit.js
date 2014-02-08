@@ -23,21 +23,21 @@ if (!Array.prototype.filter) {
         return res;
     };
 }
-View_Layer = function(name, overlay, persistant, order, width, height) {
+View_Layer = function(name, overlay, persistant, order, width, height, left, top) {
     this.name = name;
     this.overlay = overlay;
     this.persistant = persistant;
-    this.order = order;
-    this.visible = true;
+    this.visible = false;
     
     this.height = height;
     this.width = width;
     
-    this.x = -64;
-    this.y = 32;
+    this.x = left;
+    this.y = top;
     
-    this.ele_container_div = $("<div class='editor-layer-container' id='editor-layer-container-"+this.name+"'><p class='editor-layer-text'>" + this.name + "</div>");
+    this.ele_container_div = $("<div class='editor-layer-container' id='editor-layer-container-"+this.name+"'></div>");
     this.ele_content_div = $("<div class='editor-layer-contents' id='layer-contents-'"+this.name+"'></div>");
+    this.ele_text_div = $("<p class='editor-layer-text'>" + this.name + "</p>");
     
     this.ele_content_div.css('height', this.height + 'px');
     this.ele_content_div.css('width', this.width + 'px');
@@ -45,8 +45,18 @@ View_Layer = function(name, overlay, persistant, order, width, height) {
     this.ele_container_div.css('left', this.x + 'px');
     this.ele_container_div.css('top', this.y + 'px');
     
+    this.set_order(order);
+    
+    this.ele_container_div.css('z-index', this.z_order);
+    
+    this.ele_content_div.css('opacity', '0');
+    this.ele_text_div.css('opacity', '0');
+    
     this.ele_container_div.append(this.ele_content_div);
+    this.ele_container_div.append(this.ele_text_div);
+    
     $('#editor-viewport').append(this.ele_container_div);
+    this.set_visibility(true);
 }
 View_Layer.prototype.move_up = function() {
     if (this.order != 0) {
@@ -57,14 +67,11 @@ View_Layer.prototype.move_up = function() {
     }
 }
 View_Layer.prototype.move_down = function() {
-    console.log(this.order + 1);
-    console.log(window.edit.layer_order);
     if (this.order != window.edit.layer_order.length - 1) {
         var below = window.edit.layer_order[this.order +1];
-        console.log(this.order);
-        console.log(window.edit.layer_order[4]);
         if (below != undefined) {
             window.edit.swap_layers(below, this.name, this.name);
+            this.z_order = 100 - this.order;
         }
     }
 }
@@ -79,7 +86,20 @@ View_Layer.prototype.set_name = function(new_name) {
 }
 View_Layer.prototype.set_visibility = function(visibility) {
     this.visible = visibility;
-    console.log('set visibility of layer ' + name + ' to ' + visibility);
+    if (this.visible) {
+        this.ele_content_div.fadeTo(200, 1);
+        this.ele_text_div.fadeTo(200, 1);
+        this.ele_container_div.css('outline', '2px solid grey');
+    } else {
+        this.ele_content_div.fadeTo(200, 0);
+        this.ele_text_div.fadeTo(200, .25);
+        this.ele_container_div.css('outline', '2px dotted grey');
+    }
+}
+View_Layer.prototype.set_order = function(order) {
+    this.order = order;
+    this.z_order = 100 - this.order;
+    this.ele_container_div.css('z-index', this.z_order);
 }
 
 $(window).ready(function() {
@@ -90,15 +110,90 @@ $(window).ready(function() {
 
     var act_id = $('.active').attr('id');
     $('#shelf-' + act_id.substr(5, act_id.length)).show();
-    draw_grid(16, 16, 'grey');
+    window.edit.viewport.set_props(640, 480, 'black');
     $('.input-color').simpleColorPicker({ colorsPerLine: 16 });
-    for (var i = 0; i < 6; i++) {
-       //window.edit.add_layer('layer_' + i, false, false);
+    resize_editor();
+});
+
+$(document).on('keyup', '.int-only', function () {
+    if (this.value.indexOf('-') == 0) {
+        var val = this.value.replace(/[^0-9]/g, '');
+        this.value = ('-' + val);
+    } else {
+        this.value = this.value.replace(/[^0-9]/g, '');
     }
 });
-$(document).on('keyup', '.int-only', function () { 
-    this.value = this.value.replace(/[^0-9\.]/g,'');
+$(document).on('keyup', '.pos-int-only', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
 });
+
+
+resize_editor = function() {
+    var area_w = $('#area-left').width();
+    var area_h = $('#area-left').height();
+
+    console.log(area_w + ' area ' + area_h);
+    
+    var view_w = parseInt(window.edit.viewport.width); 
+    var view_h = parseInt(window.edit.viewport.height);
+    
+    console.log(view_w + ' view ' + view_h);
+    
+    var most_left = 0
+    var most_right = view_w;
+    var most_top = 0
+    var most_bottom = view_h;
+    
+    console.log('most_right : ' + most_right);
+    console.log('most_left : ' + most_left);
+    
+    for (layer in window.edit.layers) {
+        var layer = window.edit.layers[layer];
+        var w = parseInt(layer.width);
+        var h = parseInt(layer.height);
+        var left = parseInt(layer.x);
+        var top = parseInt(layer.y)
+        
+        if (left < most_left) {
+            most_left = left;
+        }
+        if (left + w > most_right) {
+            most_right = left + w;
+        }
+        
+        if (top < most_top) {
+            most_top = top;
+        }
+        if (top + h > most_bottom) {
+            most_bottom = top + h;
+        }
+    }
+    
+    most_left = Math.abs(most_left);
+    most_top = Math.abs(most_top);
+
+    var max_w = most_left + most_right + 200;
+    var max_h = most_top + most_bottom + 200;
+
+    if (max_w < area_w) {
+        max_w = area_w;
+        most_left = area_w/2 - view_w/2 - 100;
+    }
+    if (max_h < area_h) {
+        max_h = area_h;
+        most_top = area_h/2 - view_h/2 - 100;
+    }
+    
+    console.log('max width 2: ' + max_w);
+    console.log('max_height 2: ' + max_h);
+    
+    $('#editor').css('width', max_w + 'px');
+    $('#editor').css('height', max_h + 'px');
+    
+    $('#editor-viewport').css('left', most_left + 100 + 'px');
+    $('#editor-viewport').css('top', most_top + 100 + 'px');
+
+}
 
 $(document).on('click', '#btn-settings-grid', function() {
     $('#shelf-settings-all').hide();
@@ -108,6 +203,9 @@ $(document).on('click', '#grid-settings-confirm', function() {
     var w = $('#settings-grid-width').val();
     var h = $('#settings-grid-height').val();
     var c = $('#settings-grid-color').val();
+    window.edit.viewport.grid_w = w;
+    window.edit.viewport.grid_h = h;
+    window.edit.viewport.grid_color = c;
     draw_grid(w, h, c);
     var html = "<div class='alert alert-success alert-dismissable'>" +
         "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
@@ -125,7 +223,6 @@ $(document).on('click', '#grid-settings-cancel', function() {
     $('#shelf-settings-grid').hide();
     $('#shelf-settings-all').show();
 });
-
 draw_grid = function(w, h, grid_color, bkg_color) {
     var can = $('#canvas-create-grid');
     var ctx = can[0].getContext('2d');
@@ -211,8 +308,10 @@ $(document).on('click', '.layer-view', function() {
 
 layer_add_form_clear = function() {
     $('#layer-add-form-name').val('layer_' + window.edit.layer_order.length);
-    $('#layer-add-form-width').val('500');
-    $('#layer-add-form-height').val('300');
+    $('#layer-add-form-width').val('640');
+    $('#layer-add-form-height').val('480');
+    $('#layer-add-form-left').val('0');
+    $('#layer-add-form-top').val('0');
     $('span', $('#uniform-layer-add-form-overlay')).removeClass('checked');
     $('span', $('#uniform-layer-add-form-persistant')).removeClass('checked');
     $('#layer-add-form-overlay').removeAttr('checked');
@@ -229,6 +328,9 @@ $(document).on('click', '#add-layer-confirm', function() {
     var persistant =$('#layer-add-form-persistant').prop('checked');
     var width = $('#layer-add-form-width').val();
     var height = $('#layer-add-form-height').val();
+    var left = $('#layer-add-form-left').val();
+    var top = $('#layer-add-form-top').val();
+    
     if (name == '') {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
@@ -241,7 +343,7 @@ $(document).on('click', '#add-layer-confirm', function() {
             "the layer name cannot contain spaces" +
         "</div>";
         $('#layer-add-err').html(html);
-    } else if (window.edit.add_layer(name, overlay, persistant, width, height)) {
+    } else if (window.edit.add_layer(name, overlay, persistant, width, height, left, top)) {
        $('#shelf-layer-add').hide();
        $('#shelf-layer-view').show();
     } else {
@@ -301,14 +403,14 @@ $(document).on('click', '#edit-layer-confirm', function() {
     if (name == '') {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
-            "The layer requires a name." +
+            "the layer requires a name" +
         "</div>";
         $('#layer-edit-err').html(html);
         return false;
     } else if (name.indexOf(' ') != -1) {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
-            "The layer name cannot contain spaces." +
+            "the layer name cannot contain spaces" +
         "</div>";
         $('#layer-edit-err').html(html);
     } else if (window.edit.layers[name] == undefined) {
@@ -323,7 +425,7 @@ $(document).on('click', '#edit-layer-confirm', function() {
         window.edit.layer_order[layer.order] = name;
         var html = "<div class='alert alert-success alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
-            "layer " + name + " updated." +
+            "layer " + name + " updated" +
         "</div>";
         $('#layer-view-notify').html(html);
         $('#shelf-layer-edit').hide();
@@ -332,7 +434,7 @@ $(document).on('click', '#edit-layer-confirm', function() {
     } else if (name != old_name) {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
-            "A layer already exists with that name." +
+            "a layer already exists with that name" +
             "</div>";
         $('#layer-edit-err').html(html);
         return false;
@@ -357,13 +459,23 @@ $(document).on('click', '#viewport-confirm', function() {
     var h = $('#viewport-height').val();
     var c = $('#viewport-bkg-color').val();
     window.edit.viewport.set_props(w, h, c);
+    var html = "<div class='alert alert-success alert-dismissable'>" +
+            "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
+            "viewport updated" +
+        "</div>";
+    $('#viewport-notify').html(html);
+});
+$(document).on('click', '#viewport-cancel', function() {
+    var w = $('#viewport-width').val(window.edit.viewport.width);
+    var h = $('#viewport-height').val(window.edit.viewport.height);
+    var c = $('#viewport-bkg-color').val(window.edit.viewport.background_color);
 });
 
 engine_editor = function() {
     this.selected_layer = null;
     this.layers = {};
     this.layer_order = [];
-    this.add_layer = function(name, overlay, persistant, width, height) {
+    this.add_layer = function(name, overlay, persistant, width, height, left, top) {
         if (this.layers[name]) {
             return false;
         } else {
@@ -377,9 +489,10 @@ engine_editor = function() {
                     "<button type='button' class='btn btn-default btn-xs btn-layer-down' id='btn-layer-down-"+ name +"'><span class='glyphicon glyphicon-chevron-down'></span></button>" +
                 "</div>" +
             "</div>";
-            this.layers[name] = new View_Layer(name, overlay, persistant, this.layer_order.length, width, height);
+            this.layers[name] = new View_Layer(name, overlay, persistant, this.layer_order.length, width, height, left, top);
             this.layer_order.push(name);
             $('#layer-list').append(html);
+            resize_editor();
             return true;
         }
     }
@@ -393,6 +506,7 @@ engine_editor = function() {
             this.layers[this.layer_order[i]].order = i;
             
         }
+        resize_editor();
         //console.log(this.layers);
         //console.log(this.layer_order);
     }
@@ -401,8 +515,8 @@ engine_editor = function() {
         var l2 = this.layers[name_2];
         
         var tmp = l1.order;
-        l1.order = l2.order;
-        l2.order = tmp;
+        l1.set_order(l2.order);
+        l2.set_order(tmp);
         
         this.layer_order[l1.order] = name_1;
         this.layer_order[l2.order] = name_2;
@@ -416,8 +530,8 @@ engine_editor = function() {
     this.viewport = {
         left: 0,
         top: 0,
-        width : 400,
-        height : 400,
+        width : 640,
+        height : 480,
         show_grid : true,
         grid_color : 'grey',
         grid_w: 16,
