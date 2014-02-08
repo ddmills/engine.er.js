@@ -33,8 +33,8 @@ View_Layer = function(name, overlay, persistant, order, width, height) {
     this.height = height;
     this.width = width;
     
-    this.x = 100;
-    this.y = 100;
+    this.x = -64;
+    this.y = 32;
     
     this.ele_container_div = $("<div class='editor-layer-container' id='editor-layer-container-"+this.name+"'><p class='editor-layer-text'>" + this.name + "</div>");
     this.ele_content_div = $("<div class='editor-layer-contents' id='layer-contents-'"+this.name+"'></div>");
@@ -46,7 +46,7 @@ View_Layer = function(name, overlay, persistant, order, width, height) {
     this.ele_container_div.css('top', this.y + 'px');
     
     this.ele_container_div.append(this.ele_content_div);
-    $('#editor-grid').append(this.ele_container_div);
+    $('#editor-viewport').append(this.ele_container_div);
 }
 View_Layer.prototype.move_up = function() {
     if (this.order != 0) {
