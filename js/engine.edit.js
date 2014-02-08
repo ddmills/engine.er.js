@@ -367,7 +367,7 @@ engine_editor = function() {
             return false;
         } else {
             var html = "<div class='layer-view' id='layer-view-" + name + "'>" +
-                "<p class='title-layer-edit' id='title-layer-edit-" + name +  "'>" + name + "</p>" +
+                "<p class='layer-view-title' id='title-layer-edit-" + name +  "'>" + name + "</p>" +
                 "<div class='btn-group layer-controls'>" +
                     "<button type='button' class='btn btn-default btn-xs btn-layer-vis' id='btn-layer-vis-"+ name +"'><span class='glyphicon glyphicon-eye-open'></span></button>" +
                     "<button type='button' class='btn btn-default btn-xs btn-layer-edit' id='btn-layer-edit-"+ name +"'><span class='glyphicon glyphicon-pencil'></span></button>" +

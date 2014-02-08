@@ -1,3 +1,4 @@
+/* major screen divisions */
 html {
     height: 100%;
 }
@@ -10,8 +11,31 @@ body {
 }
 #area-container {
     height: 100%;
-   
     padding-top: 35px;
+}
+#area-right {
+    position: relative;
+    float: left;
+    
+    width: 20%;
+    height: 100%;
+    border-left: 1px solid #666666;
+}
+#area-bottom {
+    position: relative;
+    float: left; 
+    width: 100%;
+    height: 100%;
+}
+#area-left {
+    position: relative;
+    float: left;
+    
+    width: 80%;
+    height: 100%;
+    overflow: auto;
+    
+    background: #1A1A1A;
 }
 #area-top {
     position: absolute;
@@ -25,31 +49,8 @@ body {
     background: #D1D1D1;
     
 }
-#area-bottom {
-    position: relative;
-    float: left;
-    
-    width: 100%;
-    height: 100%;
-}
-#area-left {
-    position: relative;
-    float: left;
-    
-    width: 80%;
-    height: 100%;
-    
-    background: #1A1A1A;
-}
-#editor-grid {
-    width: 100%;
-    height: 100%;
-    
-    background-image: null;
-    background-repeat: repeat;
 
-}
-
+/* editor layers */
 .editor-layer-container {
 
     border: 1px solid grey;
@@ -72,17 +73,19 @@ body {
     top: 4px;
     color: #1A1A1A;
     z-index: 100;
+    display: hidden;
 }
 
-
-#area-right {
-    position: relative;
-    float: left;
-    
-    width: 20%;
+/* edit window */
+#editor-grid {
+    width: 100%;
     height: 100%;
-    border-left: 1px solid #666666;
+    
+    background-image: null;
+    background-repeat: repeat;
 }
+
+/* top bar */
 #main-header {
     display: inline;
     margin: 0;
@@ -93,11 +96,6 @@ body {
     height: 100%;
     width : 100%;
     padding: 5px;
-}
-#area-shelf {
-    height : 100%;
-    width : 100%;
-    padding-top: 5px;
 }
 #game-controls {
     position: relative;
@@ -111,13 +109,8 @@ body {
     top: 0px;
     float: right;
 }
-.panel {
 
-}
-h2 {
-    margin: 0;
-    padding: 0px;
-}
+/* layers : main list */
 #layer-list {
     width: 100%;
     min-height: 50px;
@@ -126,11 +119,10 @@ h2 {
     margin-top: 2px;
     overflow-y: scroll;
     overflow-x: hide;
-    background: grey;
     padding: 8px;
 }
 .layer-view {
-    border: 1px solid black;
+    border: 1px solid #B2B2B2;
     border-radius: 5px;
     margin-top: 2px;
     margin-bottom: 2px;
@@ -142,15 +134,19 @@ h2 {
 }
 .layer-controls {
     float: right;
+    display: inline;
 }
 .layer-view-selected {
     background: #E6E6E6;
-    border: 2px solid #4C86C1;
+    border: 1px dotted #4C86C1;
 }
-.title-layer-edit {
+.layer-view-title {
     margin: 2px;
     float: left;
+    display: inline;
 }
+
+/* nav tabs */
 .navtab {
     cursor: pointer;
     padding-left: 2px;
@@ -165,8 +161,25 @@ h2 {
     padding-top: 3px;
     padding-bottom: 2px;
 }
+
+/* settings : grid */
 #canvas-create-grid {
     display: none;
+}
+#grid-settings-form {
+    max-width: 200px;
+    left: 20px;
+}
+
+/* shelf */
+#area-shelf {
+    height : 100%;
+    width : 100%;
+    padding-top: 5px;
+    overflow-y: scroll;
+}
+.shelf-main {
+    padding: 15px;
 }
 #shelf-settings {
     display: none;
@@ -175,13 +188,9 @@ h2 {
     display: none;
 }
 #shelf-entities {
-    display:none;
-}
-#grid-settings-form {
-    max-width: 200px;
-    left: 20px;
-}
-.shelf-main {
-    padding: 15px;
     display: none;
 }
+#shelf-resources {
+    display: none;
+}
+
