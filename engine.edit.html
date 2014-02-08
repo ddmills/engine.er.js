@@ -34,8 +34,10 @@
         </div>
         <div id='area-bottom'>
             <div id='area-left'>
-                <div id='editor-grid'>
-                </div>             
+                <div id='area-left-floater'></div>
+                <div id='editor-viewport-centered'>
+                    <div id='editor-viewport'></div>
+                </div>
             </div>
             <div id='area-right'> 
                 <div id='area-shelf'>
@@ -134,6 +136,21 @@
                     <div id='shelf-viewport' class='shelf-main'>
                         <h3><span class='glyphicon glyphicon-camera'></span> viewport </h3>
                         <hr>
+                        <div id='viewport-notify'></div>
+                        <div class='form-group' id='viewport-form'>
+                            <label for='viewport-width'>width</label>
+                            <input type='text' class='form-control int-only' id='viewport-width' value='640'>
+                            <label for='viewport-height'>height</label>
+                            <input type='text' class='form-control int-only' id='viewport-height' value='480'>
+                            <label for='viewport-bkg-color'>background color</label>
+                            <input type='text' class='form-control input-color' id='viewport-bkg-color' value='black'>
+                        </div>
+                        <button type='button' class='btn btn-default' id='viewport-cancel'>
+                            <span class='glyphicon glyphicon-remove'></span> cancel
+                        </button>
+                        <button type='button' class='btn btn-default' id='viewport-confirm'>
+                            <span class='glyphicon glyphicon-ok'></span> confirm
+                        </button>
                     </div>
                     <div id='shelf-entities' class='shelf-main'>
                         <h3><span class='glyphicon glyphicon-heart'></span> entities </h3>
@@ -145,10 +162,10 @@
                             <h3><span class='glyphicon glyphicon-wrench'></span> settings </h3>
                             <hr>
                             <button type='button' class='btn btn-default' id='btn-settings-grid'>
-                                <span class='glyphicon glyphicon-th-large'></span> grid settings
+                                <span class='glyphicon glyphicon-th-large'></span> viewport grid
                             </button>
                             <button type='button' class='btn btn-default' id='btn-settings-other'>
-                                <span class='glyphicon glyphicon-cog'></span> other settings
+                                <span class='glyphicon glyphicon-cog'></span> other
                             </button>
                         </div>
                         <div id='shelf-settings-grid'>
@@ -161,9 +178,7 @@
                                 <label for='settings-grid-height'>height</label>
                                 <input type='text' class='form-control int-only' id='settings-grid-height' value='16'>
                                 <label for='settings-grid-color'>grid color</label>
-                                <input type='text' class='form-control input-color' id='settings-grid-color' value='#073763'>
-                                <label for='settings-bkg-color'>background color</label>
-                                <input type='text' class='form-control input-color' id='settings-bkg-color' value='#cfe2f3'>
+                                <input type='text' class='form-control input-color' id='settings-grid-color' value='grey'>
                             </div>
                             <button type='button' class='btn btn-default' id='grid-settings-cancel'>
                                 <span class='glyphicon glyphicon-remove'></span> cancel

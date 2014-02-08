@@ -90,10 +90,8 @@ $(window).ready(function() {
 
     var act_id = $('.active').attr('id');
     $('#shelf-' + act_id.substr(5, act_id.length)).show();
-    draw_grid(16, 16, '#073763', '#cfe2f3');
+    draw_grid(16, 16, 'grey');
     $('.input-color').simpleColorPicker({ colorsPerLine: 16 });
-    
-    
     for (var i = 0; i < 6; i++) {
        //window.edit.add_layer('layer_' + i, false, false);
     }
@@ -110,8 +108,7 @@ $(document).on('click', '#grid-settings-confirm', function() {
     var w = $('#settings-grid-width').val();
     var h = $('#settings-grid-height').val();
     var c = $('#settings-grid-color').val();
-    var b = $('#settings-bkg-color').val();
-    draw_grid(w, h, c, b);
+    draw_grid(w, h, c);
     var html = "<div class='alert alert-success alert-dismissable'>" +
         "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
         "grid settings changed" +
@@ -128,6 +125,7 @@ $(document).on('click', '#grid-settings-cancel', function() {
     $('#shelf-settings-grid').hide();
     $('#shelf-settings-all').show();
 });
+
 draw_grid = function(w, h, grid_color, bkg_color) {
     var can = $('#canvas-create-grid');
     var ctx = can[0].getContext('2d');
@@ -141,9 +139,7 @@ draw_grid = function(w, h, grid_color, bkg_color) {
     ctx.lineTo(0, h);
     ctx.stroke();
     var dataURL = can[0].toDataURL();
-    $('#editor-grid').css('background', bkg_color);
-    $('#editor-grid').css('background-image', 'url(' + dataURL +')');
-    
+    $('#editor-viewport').css('background-image', 'url(' + dataURL +')');
 }
 
 $(document).on('click', '.navtab', function() {
@@ -204,8 +200,6 @@ $(document).on('click', '#view-layer-add', function() {
     layer_add_form_clear();
     $('#shelf-layer-add').show();
 });
-
-
 $(document).on('click', '.layer-view', function() {
     $('.layer-view-selected').removeClass('layer-view-selected');
     $('.editor-layer-container-selected').removeClass('editor-layer-container-selected');
@@ -358,6 +352,13 @@ $(document).on('click', '#edit-layer-confirm', function() {
     }
 });
 
+$(document).on('click', '#viewport-confirm', function() {
+    var w = $('#viewport-width').val();
+    var h = $('#viewport-height').val();
+    var c = $('#viewport-bkg-color').val();
+    window.edit.viewport.set_props(w, h, c);
+});
+
 engine_editor = function() {
     this.selected_layer = null;
     this.layers = {};
@@ -412,6 +413,26 @@ engine_editor = function() {
             e1.before(e2);
             e1.after(e2);
     }
-    
+    this.viewport = {
+        left: 0,
+        top: 0,
+        width : 400,
+        height : 400,
+        show_grid : true,
+        grid_color : 'grey',
+        grid_w: 16,
+        grid_h: 16,
+        background_color : 'black',
+        set_props : function(w, h, c) {
+            this.width = w;
+            this.height = h;
+            this.background_color = c;
+            $('#editor-viewport').css('width', this.width);
+            $('#editor-viewport').css('height', this.height);
+            $('#editor-viewport').css('background', this.background_color);
+            $('#area-left-floater').css('margin-bottom', this.height/-2);
+            draw_grid(this.grid_w, this.grid_h, this.grid_color);
+        }
+    }
 }
 

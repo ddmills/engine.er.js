@@ -77,10 +77,23 @@ body {
 }
 
 /* edit window */
-#editor-grid {
-    width: 100%;
-    height: 100%;
-    
+#area-left-floater {
+    float: left;
+    height: 50%;
+    margin-bottom: -240px;
+}
+#editor-viewport-centered {
+    position: relative;
+    clear: left;
+    margin: 0 auto;
+}
+#editor-viewport {
+    box-shadow: 0px 0px 2px 2px #4C86C1;
+    position: relative;
+    width: 640px;
+    height: 480px;
+    margin: 0 auto;
+    background: black;
     background-image: null;
     background-repeat: repeat;
 }
@@ -137,8 +150,9 @@ body {
     display: inline;
 }
 .layer-view-selected {
+    box-shadow: 0px 0px 5px #4C86C1;
     background: #E6E6E6;
-    border: 1px dotted #4C86C1;
+    border: 1px solid #4C86C1;
 }
 .layer-view-title {
     margin: 2px;
