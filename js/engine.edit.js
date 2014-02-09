@@ -91,11 +91,13 @@ View_Layer.prototype.set_visibility = function(visibility) {
     if (this.visible) {
         this.ele_content_div.fadeTo(200, 1);
         this.ele_text_div.fadeTo(200, 1);
-        this.ele_container_div.css('outline', '2px solid white');
+        this.ele_container_div.addClass('editor-layer-container-visible');
+        this.ele_container_div.removeClass('editor-layer-container-hidden');
     } else {
         this.ele_content_div.fadeTo(200, 0);
-        this.ele_text_div.fadeTo(200, .25);
-        this.ele_container_div.css('outline', '2px dotted white');
+        this.ele_text_div.fadeTo(200, .15);
+        this.ele_container_div.removeClass('editor-layer-container-visible');
+        this.ele_container_div.addClass('editor-layer-container-hidden');
     }
 }
 View_Layer.prototype.set_order = function(order) {
@@ -131,6 +133,7 @@ $(window).ready(function() {
     wait_for_resize();
 });
 
+/* number form control */
 $(document).on('keyup', '.int-only', function () {
     if (this.value.indexOf('-') == 0) {
         var val = this.value.replace(/[^0-9]/g, '');
@@ -143,6 +146,7 @@ $(document).on('keyup', '.pos-int-only', function () {
     this.value = this.value.replace(/[^0-9]/g,'');
 });
 
+/* editor sizing */
 var delay = (function() {
   var timer = 0;
   return function(callback, ms) {
@@ -221,6 +225,7 @@ resize_editor = function() {
 
 }
 
+/* form control */
 $(document).on('click', '#btn-settings-grid', function() {
     $('#shelf-settings-all').hide(200);
     $('#shelf-settings-grid').show(200);
@@ -265,6 +270,7 @@ draw_grid = function(w, h, grid_color, bkg_color) {
     $('#editor-viewport').css('background-image', 'url(' + dataURL +')');
 }
 
+/* nav tabs */
 $(document).on('click', '.navtab', function() {
     if (!$(this).hasClass('active')) {
         var old_id = $('.active').attr('id');
@@ -279,6 +285,7 @@ $(document).on('click', '.navtab', function() {
     }
 });
 
+/* layer menus */
 $(document).on('click', '.btn-layer-edit', function() {
     var id = $(this).attr('id');
     var name = id.substr(15, id.length);
@@ -324,32 +331,11 @@ $(document).on('click', '#view-layer-add', function() {
     $('#shelf-layer-add').show(200);
 });
 $(document).on('click', '.layer-view', function() {
-    $('.layer-view-selected').removeClass('layer-view-selected');
-    $('.editor-layer-container-selected').removeClass('editor-layer-container-selected');
-    
     var name = $(this).children('p').html();
-    $('#editor-layer-container-' + name).addClass('editor-layer-container-selected');
-    $(this).addClass('layer-view-selected');
+    window.edit.select_layer(name);
+    
 });
-
-$(document).on('click', '#btn-resources-images', function() {
-    $('#shelf-resources-all').hide(200);
-    $('#shelf-resources-images').show(200);
-});
-$(document).on('click', '#btn-resources-sprites', function() {
-    $('#shelf-resources-all').hide(200);
-    $('#shelf-resources-sprites').show(200);
-});
-$(document).on('click', '#btn-resources-images-back', function() {
-    $('#shelf-resources-images').hide(200);
-    $('#shelf-resources-all').show(200);
-});
-$(document).on('click', '#btn-resources-sprites-back', function() {
-    $('#shelf-resources-sprites').hide(200);
-    $('#shelf-resources-all').show(200);
-});
-
-
+/* add layer */
 layer_add_form_clear = function() {
     $('#layer-add-form-name').val('layer_' + window.edit.layer_order.length);
     $('#layer-add-form-width').val('640');
@@ -398,7 +384,7 @@ $(document).on('click', '#add-layer-confirm', function() {
         $('#layer-add-err').html(html);
     }
 });
-
+/* edit layer */
 layer_edit_form_set = function(name) {
     var lay = window.edit.layers[name];
     $('#layer-edit-form-title').html("<span class='glyphicon glyphicon-file'></span>edit layer: " + name);
@@ -497,6 +483,25 @@ $(document).on('click', '#edit-layer-confirm', function() {
     }
 });
 
+/* resources */
+$(document).on('click', '#btn-resources-images', function() {
+    $('#shelf-resources-all').hide(200);
+    $('#shelf-resources-images').show(200);
+});
+$(document).on('click', '#btn-resources-sprites', function() {
+    $('#shelf-resources-all').hide(200);
+    $('#shelf-resources-sprites').show(200);
+});
+$(document).on('click', '#btn-resources-images-back', function() {
+    $('#shelf-resources-images').hide(200);
+    $('#shelf-resources-all').show(200);
+});
+$(document).on('click', '#btn-resources-sprites-back', function() {
+    $('#shelf-resources-sprites').hide(200);
+    $('#shelf-resources-all').show(200);
+});
+
+/* viewport */
 $(document).on('click', '#viewport-confirm', function() {
     var w = $('#viewport-width').val();
     var h = $('#viewport-height').val();
@@ -514,6 +519,7 @@ $(document).on('click', '#viewport-cancel', function() {
     var c = $('#viewport-bkg-color').val(window.edit.viewport.background_color);
 });
 
+/* manager */
 engine_editor = function() {
     this.selected_layer = null;
     this.layers = {};
@@ -568,13 +574,24 @@ engine_editor = function() {
             e1.before(e2);
             e1.after(e2);
     }
+    this.select_layer = function(name) {
+        $('.layer-view-selected').removeClass('layer-view-selected');
+        $('.editor-layer-container-selected').removeClass('editor-layer-container-selected');
+        $('.editor-layer-text-selected').removeClass('editor-layer-text-selected');
+        $('#editor-layer-container-' + name).addClass('editor-layer-container-selected');
+        
+        $('#layer-view-' + name).addClass('layer-view-selected');
+        layer = this.layers[name].ele_text_div.addClass('editor-layer-text-selected');
+        this.selected_layer = layer;
+        
+    }
     this.viewport = {
         left: 0,
         top: 0,
         width : 640,
         height : 480,
         show_grid : true,
-        grid_color : 'grey',
+        grid_color : '#1A1A1A',
         grid_w: 16,
         grid_h: 16,
         background_color : 'black',
@@ -600,6 +617,9 @@ engine_editor = function() {
             ele.fadeTo(1000, 1);
             draw_grid(this.grid_w, this.grid_h, this.grid_color);
         }
+    }
+    this.resources = {
+        
     }
 }
 

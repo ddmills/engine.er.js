@@ -53,11 +53,13 @@ body {
 
 /* editor layers */
 .editor-layer-container {
-    outline: 2px solid white;
+    outline: 2px solid grey;
     position: absolute;
 }
 .editor-layer-container-selected {
-    box-shadow: 0px 0px 5px 3px #4C86C1;
+    box-shadow: 0px 0px 3px 2px #4C86C1;
+    outline: 1px solid #4C86C1;
+    
 }
 .editor-layer-contents {
     position: relative;
@@ -66,15 +68,24 @@ body {
 }
 .editor-layer-text {
     position: absolute;
-    left: 4px;
-    top: 4px;
-    color: white;
+    left: 2px;
+    top: 0px;
+    color: #E6E6E6;
     display: hidden;
+    font-size: 9px;
 }
+.editor-layer-text-selected {
+    color: #85C2FF;
+}
+.editor-layer-container-hidden {
+    outline: 2px dotted grey;
+    box-shadow: none;
+}
+
 
 /* edit window */
 #editor-viewport {
-    box-shadow: 0px 0px 2px 2px grey;
+    box-shadow: 0px 0px 1px 1px #1A1A1A;
     display: block;
     position: relative;
     width: 640px;
