@@ -23,6 +23,19 @@ if (!Array.prototype.filter) {
         return res;
     };
 }
+Res_Image = function(name, source) {
+    this.name = name;
+    this.source = source;
+    this.img = new Image();
+    var me = this;
+    this.img.onload = function() {
+        window.edit.resources.img_loaded(me);
+    }
+    this.img.onerror = function() {
+        window.edit.resources.img_error(me);
+    }
+    this.img.src = source;
+}
 View_Layer = function(name, overlay, persistant, order, width, height, left, top) {
     this.name = name;
     this.overlay = overlay;
@@ -131,6 +144,9 @@ $(window).ready(function() {
     $('#shelf-' + act_id.substr(5, act_id.length)).show();
     $('.input-color').simpleColorPicker({ colorsPerLine: 16 });
     wait_for_resize();
+    var can = $('#images-thumbs');
+    can.attr('width', can.css('width'));
+    can.attr('height', can.css('height'));
 });
 
 /* number form control */
@@ -158,6 +174,9 @@ $(window).resize(function() {
     delay(function(){
         resize_editor();
     }, 500);
+    var can = $('#images-thumbs');
+    can.attr('width', can.css('width'));
+    can.attr('height', can.css('height'));
 });
 wait_for_resize = function() {
     if ($('#area-left').css('height') == '0px') {
@@ -518,6 +537,16 @@ $(document).on('click', '#viewport-cancel', function() {
     var h = $('#viewport-height').val(window.edit.viewport.height);
     var c = $('#viewport-bkg-color').val(window.edit.viewport.background_color);
 });
+$(document).on('click', '#image-add-confirm', function() {
+    var source = $('#image-add-path').val()
+    var name = $('#image-add-name').val()
+    window.edit.resources.add_img(name, source);
+});
+$(document).on('change', '#image-list', function() {
+    var name = $(this).val().substr(9, $(this).val().length);
+    console.log(name);
+    window.edit.resources.draw_thumb(name);
+});
 
 /* manager */
 engine_editor = function() {
@@ -619,7 +648,49 @@ engine_editor = function() {
         }
     }
     this.resources = {
-        
+        imgs: {},
+        thumb_can: $('#image-thumb'),
+        add_img: function(name, source) {
+            if (this.imgs[name] == undefined) {
+                new Res_Image(name, source);
+            } else {
+                var html = "<div class='alert alert-danger alert-dismissable'>" +
+                "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
+                "there is already an image named \"" + name + "\"</div>";
+                $('#resources-images-notify').html(html);
+            }
+        },
+        img_loaded: function(img) {
+            var name = img.name;
+            var html = "<div class='alert alert-success alert-dismissable'>" +
+                "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
+                "image \"" + name + "\" loaded successfully" +
+                "</div>";
+            $('#resources-images-notify').html(html);
+            this.imgs[name] = img;
+            
+            var opt = $("<option value='img-thumb-" + name + "'>" + name +"</option>");
+            $('#image-list').append(opt);
+            $('#images-thumbs').show(500);
+
+            console.log(name + ' image loaded');
+            this.draw_thumb(name);
+        },
+        img_error: function(img) {
+            var html = "<div class='alert alert-danger alert-dismissable'>" +
+                "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
+                "image failed to load, check that the source is correct</div>";
+            $('#resources-images-notify').html(html);
+            console.log(img.name + ' failed to load');
+        },
+        draw_thumb : function(name) {
+            var img = this.imgs[name].img;
+            var ctx = this.thumb_can[0].getContext('2d');
+            var w = this.thumb_can.css('width');
+            var h = this.thumb_can.css('height');
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0);
+        }
     }
 }
 

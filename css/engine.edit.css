@@ -182,10 +182,6 @@ body {
 #canvas-create-grid {
     display: none;
 }
-#grid-settings-form {
-    max-width: 200px;
-    left: 20px;
-}
 
 /* shelf */
 #area-shelf {
@@ -225,3 +221,23 @@ display: none;
     display: none;
 }
 
+/* resources: images*/
+#image-thumb {
+    background: white;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    box-shadow: 0px 0px 2px 1px grey;
+}
+#images-thumbs {
+    display: none;
+}
+/* general */
+.btn-back:hover {
+    color: #428BCA;
+    cursor: pointer;
+}
+.form-group>.btn {
+    margin-top: 8px;
+}
