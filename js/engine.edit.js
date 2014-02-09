@@ -107,12 +107,11 @@ $(window).ready(function() {
     $('#shelf-layer-add').hide();
     $('#shelf-layer-edit').hide();
     $('#shelf-settings-grid').hide();
-
+    
     var act_id = $('.active').attr('id');
     $('#shelf-' + act_id.substr(5, act_id.length)).show();
-    window.edit.viewport.set_props(640, 480, 'black');
     $('.input-color').simpleColorPicker({ colorsPerLine: 16 });
-    resize_editor();
+    wait_for_resize();
 });
 
 $(document).on('keyup', '.int-only', function () {
@@ -127,25 +126,41 @@ $(document).on('keyup', '.pos-int-only', function () {
     this.value = this.value.replace(/[^0-9]/g,'');
 });
 
+var delay = (function() {
+  var timer = 0;
+  return function(callback, ms) {
+    clearTimeout (timer);
+    timer = setTimeout(callback, ms);
+  };
+})();
+
+$(window).resize(function() {
+    delay(function(){
+        resize_editor();
+    }, 500);
+});
+
+wait_for_resize = function() {
+    if ($('#area-left').css('height') == '0px') {
+        setTimeout(wait_for_resize, .2);
+    } else {
+        window.edit.viewport.add_viewport(640, 480);
+        resize_editor();
+    }
+};
 
 resize_editor = function() {
     var area_w = $('#area-left').width();
     var area_h = $('#area-left').height();
-
-    console.log(area_w + ' area ' + area_h);
     
     var view_w = parseInt(window.edit.viewport.width); 
     var view_h = parseInt(window.edit.viewport.height);
-    
-    console.log(view_w + ' view ' + view_h);
     
     var most_left = 0
     var most_right = view_w;
     var most_top = 0
     var most_bottom = view_h;
-    
-    console.log('most_right : ' + most_right);
-    console.log('most_left : ' + most_left);
+
     
     for (layer in window.edit.layers) {
         var layer = window.edit.layers[layer];
@@ -183,9 +198,6 @@ resize_editor = function() {
         max_h = area_h;
         most_top = area_h/2 - view_h/2 - 100;
     }
-    
-    console.log('max width 2: ' + max_w);
-    console.log('max_height 2: ' + max_h);
     
     $('#editor').css('width', max_w + 'px');
     $('#editor').css('height', max_h + 'px');
@@ -507,8 +519,6 @@ engine_editor = function() {
             
         }
         resize_editor();
-        //console.log(this.layers);
-        //console.log(this.layer_order);
     }
     this.swap_layers = function(name_1, name_2, collapse) {
         var l1 = this.layers[name_1];
@@ -544,7 +554,18 @@ engine_editor = function() {
             $('#editor-viewport').css('width', this.width);
             $('#editor-viewport').css('height', this.height);
             $('#editor-viewport').css('background', this.background_color);
-            $('#area-left-floater').css('margin-bottom', this.height/-2);
+            draw_grid(this.grid_w, this.grid_h, this.grid_color);
+        },
+        add_viewport : function(w, h) {
+            var ele = $("<div id='editor-viewport'></div>");
+            this.width = w;
+            this.height = h;
+            ele.css('width', this.width);
+            ele.css('height', this.height);
+            ele.css('background', this.background_color);
+            ele.css('opacity', 0);
+            $('#editor').append(ele);
+            ele.fadeTo(1000, 1);
             draw_grid(this.grid_w, this.grid_h, this.grid_color);
         }
     }
