@@ -353,11 +353,12 @@
                         </div>
                         <div id='shelf-components-create'>
                             <div id='components-create-notify' class='alert-area'></div>
-                            <h3><span class='glyphicon glyphicon-tree-deciduous'></span> create component </h3>
+                            <h3><span class='glyphicon glyphicon-tree-deciduous'></span> add component </h3>
                             <hr>
                             <div class='form-group well' id='comp-add-form'>
                                 <label for='comp-add-name'>name</label>
                                 <input type='text' class='form-control' id='comp-add-name'>
+                                
                                 <label for='comp-add-display'>display type</label>
                                 <select  class='form-control' id='comp-add-displaytype'>
                                     <option data-content='<span class="glyphicon glyphicon-picture"></span> image' value='image'> </option>
@@ -365,23 +366,41 @@
                                     <option data-content='<span class="glyphicon glyphicon-header"></span> text' value='text'> </option>
                                     <option data-content='<span class="glyphicon glyphicon-eye-close"></span> none' value='none'> </option>
                                 </select>
-                                <div class='comp-disptype' id='comp-add-displaytype-sprite-opitons'>
-                                </div>
-                                <div class='comp-disptype' id='comp-add-displaytype-image-options'>
-                                    <label for='comp-add-width'>width</label>
-                                    <input type='text' class='form-control int-only' id='comp-add-image-width' value='32'>
-                                    <label for='comp-add-height'>height</label>
-                                    <input type='text' class='form-control int-only' id='comp-add-image-height' value='32'>
-                                </div>
-                                <div class='comp-disptype' id='comp-add-displaytype-text-options'>
-                                    <label for='comp-add-text-text'> text </label>
-                                    <input type='text' class='form-control' id='comp-add-text-text' value=''>
-                                    <label for='comp-add-text-color'>text color</label>
-                                    <input type='text' class='form-control input-color' id='comp-add-text-color' value='white'>
-                                </div>
-                                <div class='comp-disptype' id='comp-add-displaytype-none-options'>
-                                    <label for='comp-add-color'>editor color</label>
-                                    <input type='text' class='form-control input-color' id='comp-add-editcolor' value='blue'>
+                                <div class='well form-group-sub'>
+                                
+                                    <div class='comp-disptype' id='comp-add-displaytype-sprite-opitons'>
+                                    </div>
+                                    
+                                    <div class='comp-disptype' id='comp-add-displaytype-image-options'>
+                                        <label for='comp-add-image-res'> image resource</label>
+                                        <select class='form-control' id='comp-add-image-res' value=''>
+                                        </select>
+                                        <label for='comp-add-image-width'>width</label>
+                                        <input type='text' class='form-control int-only' id='comp-add-image-width' value='32'>
+                                        <label for='comp-add-image-height'>height</label>
+                                        <input type='text' class='form-control int-only' id='comp-add-image-height' value='32'>
+                                    </div>
+                                    
+                                    <div class='comp-disptype' id='comp-add-displaytype-text-options'>
+                                        <label for='comp-add-text-text'> text </label>
+                                        <input type='text' class='form-control' id='comp-add-text-text' value='sometext'>
+                                        <label for='comp-add-text-font'>font</label>
+                                        <input type='text' class='form-control disabled' id='comp-add-text-font' value='lucidia-console'>
+                                        <label for='comp-add-text-size'>size</label>
+                                        <input type='text' class='form-control pos-int-only' id='comp-add-text-size' value='10'>
+                                        <label for='comp-add-text-color'>color</label>
+                                        <input type='text' class='form-control input-color' id='comp-add-text-color' value='white'>
+                                    </div>
+                                    
+                                    <div class='comp-disptype' id='comp-add-displaytype-none-options'>
+                                        <label for='comp-add-none-width'>editor width</label>
+                                        <input type='text' class='form-control int-only' id='comp-add-none-width' value='32'>
+                                        <label for='comp-add-none-height'>editor height</label>
+                                        <input type='text' class='form-control int-only' id='comp-add-none-height' value='32'>
+                                        <label for='comp-add-none-editcolor'>editor color</label>
+                                        <input type='text' class='form-control input-color' id='comp-add-none-editcolor' value='blue'>
+                                    </div>
+                                 
                                 </div>
                                 <button type='button' class='btn btn-default' id='component-add-cancel'>
                                     <span class='glyphicon glyphicon-remove'></span> cancel

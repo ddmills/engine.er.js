@@ -160,8 +160,11 @@ body {
     float: left;
     display: inline;
 }
-
-.layer-controls {
+.big-list-item:hover {
+    cursor: pointer;
+    border: 1px solid #4C86C1;
+}
+.big-list-item-controls {
     float: right;
     display: inline;
 }
@@ -269,4 +272,10 @@ h3 {
 }
 .form-group>.btn {
     margin-top: 8px;
+}
+.form-group-sub {
+    padding-top: 4px;
+    background-color: #E7E7E7;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
 }

@@ -43,6 +43,9 @@ Res_Image.prototype.get_json = function() {
     }
     return json;
 }
+Res_Image.prototype.remove = function() {
+
+}
 View_Layer = function(name, overlay, persistant, order, width, height, left, top) {
     this.name = name;
     this.overlay = overlay;
@@ -163,13 +166,17 @@ View_Layer.prototype.get_json = function() {
 Component = function(name, type, opts) {
     this.name = name;
     this.type = type;
-    this.opts = opts;
+    if (this.type == 'text') {
+        this.text = opts.text;
+        this.font = opts.font;
+        this.color = opts.color;
+    }
 }
 Component.prototype.remove = function() {
-
+    console.log('remove me. implement pls')
 }
-Component.prototype.settings() {
-
+Component.prototype.settings = function() {
+    console.log('settings. implement pls');
 }
 
 $(window).ready(function() {
@@ -581,11 +588,28 @@ $(document).on('click', '#res-images-list > .big-list-item', function() {
 });
 
 /* components */
+component_add_form_clear = function() {
+    $('#comp-add-name').val('');
+    
+    $('#comp-add-image-res').val('');
+    $('#comp-add-image-width').val('32');
+    $('#comp-add-image-height').val('32');
+    
+    $('#comp-add-text-text').val('sometext');
+    $('#comp-add-text-font').val('lucidia-console');
+    $('#comp-add-text-size').val('10');
+    $('#comp-add-text-color').val('white');
+    
+    $('#comp-add-none-width').val('32');
+    $('#comp-add-none-height').val('32');
+    $('#comp-add-none-editcolor').val('blue');
+
+}
 $(document).on('click', '#btn-component-add', function() {
     $('#shelf-components-all').hide(200);
+    component_add_form_clear();
     var type= $('#comp-add-displaytype').val(); 
     $('#comp-add-displaytype-' + type + '-options').addClass('comp-disptype-selected');
-    
     $('#shelf-components-create').show(200);
 });
 $(document).on('click', '#component-add-cancel', function() {
@@ -687,7 +711,7 @@ engine_editor = function() {
         } else {
             var html = "<div class='big-list-item layer-item' id='layer-view-" + name + "'>" +
                 "<p class='big-list-item-title' id='title-layer-edit-" + name +  "'>" + name + "</p>" +
-                "<div class='btn-group layer-controls'>" +
+                "<div class='btn-group big-list-item-controls'>" +
                     "<button title='show or hide' type='button' class='btn btn-default btn-xs btn-layer-vis' id='btn-layer-vis-"+ name +"'><span class='glyphicon glyphicon-eye-open'></span></button>" +
                     "<button title='edit properties' type='button' class='btn btn-default btn-xs btn-layer-edit' id='btn-layer-edit-"+ name +"'><span class='glyphicon glyphicon-pencil'></span></button>" +
                     "<button title='delete' type='button' class='btn btn-default btn-xs btn-layer-delete' id='btn-layer-delete-"+ name +"'><span class='glyphicon glyphicon-trash'></span></button>" +
@@ -816,10 +840,17 @@ engine_editor = function() {
             this.imgs[name] = img;
             var opt = $("<div class='big-list-item' id='res-image-item-" + name + "'>" +
                 "<p class='big-list-item-title' id='title-res-image-" + name +  "'>" + name + "</p>" +
-                "</div>");
+                "<div class='btn-group big-list-item-controls'>" +
+                "<button title='delete' class='btn btn-default btn-xs btn-img-delete' id='btn-image-delete-" + name + "'><span class='glyphicon glyphicon-trash'></span></button>" +
+                "<button title='refresh' class='btn btn-default btn-xs btn-img-refresh' id='btn-image-refresh-" + name + "'><span class='glyphicon glyphicon-refresh'></span></button>" +
+                "</div></div>");
 
             $('#res-images-list').append(opt);
             $('#images-thumbs').show(500);
+            
+            var ele = $("<option value='res-img-" + name+"'>" + name + "</option>");
+            $('#comp-add-image-res').append(ele);
+            
             this.draw_thumb(name);
         },
         img_error: function(img) {
@@ -901,6 +932,3 @@ engine_editor = function() {
         
     }
 }
-
-
-
