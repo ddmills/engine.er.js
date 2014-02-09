@@ -125,10 +125,6 @@ View_Layer.prototype.remove = function() {
 
 $(window).ready(function() {
     window.edit = new engine_editor();
-    $('#shelf-layer-add').hide();
-    $('#shelf-layer-edit').hide();
-    $('#shelf-settings-grid').hide();
-    
     var act_id = $('.active').attr('id');
     $('#shelf-' + act_id.substr(5, act_id.length)).show();
     $('.input-color').simpleColorPicker({ colorsPerLine: 16 });
@@ -226,8 +222,8 @@ resize_editor = function() {
 }
 
 $(document).on('click', '#btn-settings-grid', function() {
-    $('#shelf-settings-all').hide();
-    $('#shelf-settings-grid').show();
+    $('#shelf-settings-all').hide(200);
+    $('#shelf-settings-grid').show(200);
 });
 $(document).on('click', '#grid-settings-confirm', function() {
     var w = $('#settings-grid-width').val();
@@ -242,16 +238,16 @@ $(document).on('click', '#grid-settings-confirm', function() {
         "grid settings changed" +
     "</div>";
     $('#settings-all-notify').html(html);
-    $('#shelf-settings-grid').hide();
-    $('#shelf-settings-all').show();
+    $('#shelf-settings-grid').hide(200);
+    $('#shelf-settings-all').show(200);
 });
 $(document).on('click', '#grid-settings-cancel', function() {
     $('#settings-grid-width').val();
     $('#settings-grid-height').val();
     $('#settings-grid-color').val();
     $('#settings-bkg-color').val();
-    $('#shelf-settings-grid').hide();
-    $('#shelf-settings-all').show();
+    $('#shelf-settings-grid').hide(200);
+    $('#shelf-settings-all').show(200);
 });
 draw_grid = function(w, h, grid_color, bkg_color) {
     var can = $('#canvas-create-grid');
@@ -278,8 +274,8 @@ $(document).on('click', '.navtab', function() {
         $(this).addClass('active');
         var cur_id = $(this).attr('id');
         var cur = cur_id.substr(5, cur_id.length);
-        $('#shelf-' + old).hide(400);
-        $('#shelf-' + cur).show(400);
+        $('#shelf-' + old).hide(200);
+        $('#shelf-' + cur).show(200);
     }
 });
 
@@ -287,8 +283,8 @@ $(document).on('click', '.btn-layer-edit', function() {
     var id = $(this).attr('id');
     var name = id.substr(15, id.length);
     layer_edit_form_set(name);
-    $('#shelf-layer-view').hide();
-    $('#shelf-layer-edit').show();
+    $('#shelf-layer-view').hide(200);
+    $('#shelf-layer-edit').show(200);
 });
 $(document).on('click', '.btn-layer-vis', function() {
     var id = $(this).attr('id');
@@ -323,9 +319,9 @@ $(document).on('click', '.btn-layer-delete', function() {
     }
 });
 $(document).on('click', '#view-layer-add', function() {
-    $('#shelf-layer-view').hide();
+    $('#shelf-layer-view').hide(200);
     layer_add_form_clear();
-    $('#shelf-layer-add').show();
+    $('#shelf-layer-add').show(200);
 });
 $(document).on('click', '.layer-view', function() {
     $('.layer-view-selected').removeClass('layer-view-selected');
@@ -335,6 +331,24 @@ $(document).on('click', '.layer-view', function() {
     $('#editor-layer-container-' + name).addClass('editor-layer-container-selected');
     $(this).addClass('layer-view-selected');
 });
+
+$(document).on('click', '#btn-resources-images', function() {
+    $('#shelf-resources-all').hide(200);
+    $('#shelf-resources-images').show(200);
+});
+$(document).on('click', '#btn-resources-sprites', function() {
+    $('#shelf-resources-all').hide(200);
+    $('#shelf-resources-sprites').show(200);
+});
+$(document).on('click', '#btn-resources-images-back', function() {
+    $('#shelf-resources-images').hide(200);
+    $('#shelf-resources-all').show(200);
+});
+$(document).on('click', '#btn-resources-sprites-back', function() {
+    $('#shelf-resources-sprites').hide(200);
+    $('#shelf-resources-all').show(200);
+});
+
 
 layer_add_form_clear = function() {
     $('#layer-add-form-name').val('layer_' + window.edit.layer_order.length);
@@ -349,8 +363,8 @@ layer_add_form_clear = function() {
     $('#layer-add-err').html('');
 }
 $(document).on('click', '#add-layer-cancel', function() {
-   $('#shelf-layer-add').hide();
-   $('#shelf-layer-view').show();
+   $('#shelf-layer-add').hide(200);
+   $('#shelf-layer-view').show(200);
 });
 $(document).on('click', '#add-layer-confirm', function() {
     var name = $('#layer-add-form-name').val();
@@ -374,8 +388,8 @@ $(document).on('click', '#add-layer-confirm', function() {
         "</div>";
         $('#layer-add-err').html(html);
     } else if (window.edit.add_layer(name, overlay, persistant, width, height, left, top)) {
-       $('#shelf-layer-add').hide();
-       $('#shelf-layer-view').show();
+       $('#shelf-layer-add').hide(200);
+       $('#shelf-layer-view').show(200);
     } else {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
@@ -421,9 +435,9 @@ layer_edit_form_clear = function() {
     $('#layer-edit-err').html('');
 }
 $(document).on('click', '#edit-layer-cancel', function() {
-    $('#shelf-layer-edit').hide();
+    $('#shelf-layer-edit').hide(200);
     $('#layer-view-notify').html('');
-    $('#shelf-layer-view').show();
+    $('#shelf-layer-view').show(200);
 });
 $(document).on('click', '#edit-layer-confirm', function() {
     var old_name = $('#layer-edit-form-name').data('lay_name');
@@ -459,8 +473,8 @@ $(document).on('click', '#edit-layer-confirm', function() {
             "layer " + name + " updated" +
         "</div>";
         $('#layer-view-notify').html(html);
-        $('#shelf-layer-edit').hide();
-        $('#shelf-layer-view').show();
+        $('#shelf-layer-edit').hide(200);
+        $('#shelf-layer-view').show(200);
         return true;
     } else if (name != old_name) {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
@@ -477,8 +491,8 @@ $(document).on('click', '#edit-layer-confirm', function() {
             "layer " + name + " updated." +
         "</div>";
         $('#layer-view-notify').html(html);
-        $('#shelf-layer-edit').hide();
-        $('#shelf-layer-view').show();
+        $('#shelf-layer-edit').hide(200);
+        $('#shelf-layer-view').show(200);
         return true;
     }
 });
