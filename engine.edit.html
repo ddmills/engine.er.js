@@ -6,12 +6,14 @@
     <!-- scripts -->
     <script src='./js/jquery.min.js'></script>
     <script src='./js/bootstrap.min.js'></script>
+    <script src='./js/bootstrap-select.min.js'></script>
     <script src='./js/simple-color-picker.min.js'></script>
     <script src='./engine.er.js'></script>
     <script src='./js/engine.edit.js'></script>
     
     <!-- stylesheets -->
     <link href='css/bootstrap.min.css' rel='stylesheet'>
+    <link href='css/bootstrap-select.min.css' rel='stylesheet'>
     <link href='css/simple-color-picker.css' rel='stylesheet'>
     <link href='css/engine.edit.css' rel='stylesheet'>
     
@@ -136,8 +138,9 @@
                         <div id='shelf-layer-view'>
                             <h3><span class='glyphicon glyphicon-file'></span> layers </h3>
                             <hr>
-                            <div id='layer-view-err' class='alert-area'></div>
                             <div id='layer-view-notify' class='alert-area'></div>
+                            <div id='layer-view-err' class='alert-area'></div>
+                            
                             <div class='well big-list' id='layer-list'></div>
                             <button type='button' class='btn btn-default' id='view-layer-add'>
                                 <span class='glyphicon glyphicon-plus'></span> add layer
@@ -316,17 +319,14 @@
                             <div class='well' id='images-thumbs'>
                                 <canvas id='image-thumb'></canvas>
                                 <div class='big-list' id='res-images-list'></div>
-                            </div>
-                            
-                            
-                            
+                            </div>   
                             <div class='form-group well' id='add-image-form'>
                                 <label for='image-add-path'>image path</label>
                                 <input type='text' class='form-control' id='image-add-path' placeholder='./imgs/...'>
                                 <label for='image-add-name'>name</label>
                                 <input type='text' class='form-control' id='image-add-name' placeholder='name'>
                                 <button type='button' class='btn btn-default' id='image-add-confirm'>
-                                    <span class='glyphicon glyphicon-plus'></span> add image
+                                    <span class='glyphicon glyphicon-plus'></span> add
                                 </button>
                             </div>
                         </div>
@@ -346,7 +346,50 @@
                             <div id='components-all-notify' class='alert-area'></div>
                             <h3><span class='glyphicon glyphicon-tree-deciduous'></span> components </h3>
                             <hr>
-                            
+                            <div class='well big-list' id='component-list'></div>
+                            <button type='button' class='btn btn-default' id='btn-component-add'>
+                                    <span class='glyphicon glyphicon-plus'></span> add component
+                            </button>
+                        </div>
+                        <div id='shelf-components-create'>
+                            <div id='components-create-notify' class='alert-area'></div>
+                            <h3><span class='glyphicon glyphicon-tree-deciduous'></span> create component </h3>
+                            <hr>
+                            <div class='form-group well' id='comp-add-form'>
+                                <label for='comp-add-name'>name</label>
+                                <input type='text' class='form-control' id='comp-add-name'>
+                                <label for='comp-add-display'>display type</label>
+                                <select  class='form-control' id='comp-add-displaytype'>
+                                    <option data-content='<span class="glyphicon glyphicon-picture"></span> image' value='image'> </option>
+                                    <option data-content='<span class="glyphicon glyphicon-send"></span> sprite' value='sprite'> </option>
+                                    <option data-content='<span class="glyphicon glyphicon-header"></span> text' value='text'> </option>
+                                    <option data-content='<span class="glyphicon glyphicon-eye-close"></span> none' value='none'> </option>
+                                </select>
+                                <div class='comp-disptype' id='comp-add-displaytype-sprite-opitons'>
+                                </div>
+                                <div class='comp-disptype' id='comp-add-displaytype-image-options'>
+                                    <label for='comp-add-width'>width</label>
+                                    <input type='text' class='form-control int-only' id='comp-add-image-width' value='32'>
+                                    <label for='comp-add-height'>height</label>
+                                    <input type='text' class='form-control int-only' id='comp-add-image-height' value='32'>
+                                </div>
+                                <div class='comp-disptype' id='comp-add-displaytype-text-options'>
+                                    <label for='comp-add-text-text'> text </label>
+                                    <input type='text' class='form-control' id='comp-add-text-text' value=''>
+                                    <label for='comp-add-text-color'>text color</label>
+                                    <input type='text' class='form-control input-color' id='comp-add-text-color' value='white'>
+                                </div>
+                                <div class='comp-disptype' id='comp-add-displaytype-none-options'>
+                                    <label for='comp-add-color'>editor color</label>
+                                    <input type='text' class='form-control input-color' id='comp-add-editcolor' value='blue'>
+                                </div>
+                                <button type='button' class='btn btn-default' id='component-add-cancel'>
+                                    <span class='glyphicon glyphicon-remove'></span> cancel
+                                </button>
+                                <button type='button' class='btn btn-default' id='component-add-confirm'>
+                                    <span class='glyphicon glyphicon-ok'></span> confirm
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

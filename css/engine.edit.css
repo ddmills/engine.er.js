@@ -87,7 +87,7 @@ body {
 
 /* edit window */
 #editor-viewport {
-    box-shadow: 0px 0px 1px 1px #1A1A1A;
+    box-shadow: 0px 0px 4px 1px #101010;
     display: block;
     position: relative;
     width: 640px;
@@ -230,6 +230,18 @@ display: none;
 #shelf-components {
     display: none;
 }
+#shelf-components-create {
+    display: none;
+}
+
+/* add component form */
+.comp-disptype {
+    display: none;
+}
+.comp-disptype-selected {
+    display: inline;
+}
+
 /* resources: images*/
 #image-thumb {
     background: white;

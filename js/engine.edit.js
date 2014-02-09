@@ -160,6 +160,18 @@ View_Layer.prototype.get_json = function() {
     return json;
 }
 
+Component = function(name, type, opts) {
+    this.name = name;
+    this.type = type;
+    this.opts = opts;
+}
+Component.prototype.remove = function() {
+
+}
+Component.prototype.settings() {
+
+}
+
 $(window).ready(function() {
     window.edit = new engine_editor();
     var act_id = $('.active').attr('id');
@@ -169,6 +181,7 @@ $(window).ready(function() {
     var can = $('#images-thumbs');
     can.attr('width', can.css('width'));
     can.attr('height', can.css('height'));
+    $('#comp-add-displaytype').selectpicker();
 });
 
 /* number form control */
@@ -269,7 +282,7 @@ resize_editor = function() {
 $(document).on('DOMSubtreeModified', '.alert-area', function(e) {
     var child = $(this).children();
     setTimeout(function() {
-        child.slideUp(2000);
+        child.hide(500);
     }, 2000);
 });
 
@@ -565,6 +578,26 @@ $(document).on('click', '#res-images-list > .big-list-item', function() {
     $(this).addClass('big-list-item-selected');
     console.log(name);
     window.edit.resources.draw_thumb(name);
+});
+
+/* components */
+$(document).on('click', '#btn-component-add', function() {
+    $('#shelf-components-all').hide(200);
+    var type= $('#comp-add-displaytype').val(); 
+    $('#comp-add-displaytype-' + type + '-options').addClass('comp-disptype-selected');
+    
+    $('#shelf-components-create').show(200);
+});
+$(document).on('click', '#component-add-cancel', function() {
+    $('#shelf-components-all').show(200);
+    $('#shelf-components-create').hide(200);
+});
+$(document).on('change', '#comp-add-displaytype', function() {
+    var type= $('#comp-add-displaytype').val(); 
+    console.log('val changed');
+    $('.comp-disptype-selected').removeClass('comp-disptype-selected');
+    $('#comp-add-displaytype-' + type + '-options').addClass('comp-disptype-selected');
+
 });
 
 /* load and save */
