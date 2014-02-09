@@ -73,9 +73,11 @@ body {
     color: #E6E6E6;
     display: hidden;
     font-size: 9px;
+    z-index: 100;
 }
 .editor-layer-text-selected {
     color: #85C2FF;
+    z-index: 150;
 }
 .editor-layer-container-hidden {
     outline: 2px dotted grey;
@@ -113,16 +115,15 @@ body {
     width : 100%;
     padding: 5px;
 }
-#game-controls {
+.header-controls {
     position: relative;
-    margin-right: 40px;
     top: 0px;
-}   
-#file-controls {
-    margin-left: 20px;
-    position: relative;
-    margin-right: 20px;
-    top: 0px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.list-file-item-selected {
+    background: grey;
 }
 
 /* layers : main list */

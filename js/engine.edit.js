@@ -36,6 +36,13 @@ Res_Image = function(name, source) {
     }
     this.img.src = source;
 }
+Res_Image.prototype.get_json = function() {
+    var json = {
+        name: this.name,
+        source: this.source
+    }
+    return json;
+}
 View_Layer = function(name, overlay, persistant, order, width, height, left, top) {
     this.name = name;
     this.overlay = overlay;
@@ -74,6 +81,7 @@ View_Layer.prototype.move_up = function() {
         var above = window.edit.layer_order[this.order - 1];
         if (above != undefined) {
             window.edit.swap_layers(this.name, above, above);
+            this.z_order = 100 - this.order;
         }
     }
 }
@@ -136,6 +144,20 @@ View_Layer.prototype.settings = function(name, overlay, persistant, width, heigh
 }
 View_Layer.prototype.remove = function() {
     this.ele_container_div.remove();
+}
+View_Layer.prototype.get_json = function() {
+    var json = {
+        name: this.name,
+        overlay: this.overlay,
+        persistant : this.persistant,
+        height: this.height,
+        width: this.width,
+        left: this.x,
+        top: this.y,
+        order: this.order
+    }
+    
+    return json;
 }
 
 $(window).ready(function() {
@@ -520,6 +542,49 @@ $(document).on('click', '#btn-resources-sprites-back', function() {
     $('#shelf-resources-all').show(200);
 });
 
+/* load and save */
+$(document).on('click', '#btn-save', function() {
+    $('#save-modal').modal('show');
+});
+$(document).on('click', '#btn-file-open', function() {
+    var id = $('.list-file-item-selected').attr('id');
+    if (id != undefined) {
+        var selected = id.substr(10, id.length);
+        $('#open-modal').modal('hide');
+        window.edit.files.load_file(selected);
+    } else {
+        console.log('selecte a file...');
+    }
+});
+$(document).on('click', '#btn-load', function() {
+    var keys = window.edit.files.get_files();
+    $('#file-open-list').html('');
+    for (var index in keys) {
+        console.log('key ' + keys[index]);
+        var key = keys[index];
+        var ele = $("<li class='list-group-item list-file-item' id='open-file-" + key +"'>" + key + "</li>");
+        $('#file-open-list').append(ele);
+    }
+});
+$(document).on('click', '.list-file-item', function() {
+    $('.list-file-item-selected').removeClass('list-file-item-selected');
+    $(this).addClass('list-file-item-selected');
+});
+$(document).on('click', '#btn-save', function() {
+    console.log(window.edit.files.storage);
+    if (window.edit.files.current_file != '') {
+        window.edit.files.save();
+    } else {
+        var name = $('#saveas-file-name').val();
+        $('#saveas-modal').modal('show');
+    }
+});
+$(document).on('click', '#btn-file-saveas', function() {
+    var name = $('#saveas-file-name').val();
+    console.log('saving ' + name);
+    window.edit.files.save_as(name);
+});
+
 /* viewport */
 $(document).on('click', '#viewport-confirm', function() {
     var w = $('#viewport-width').val();
@@ -550,9 +615,24 @@ $(document).on('change', '#image-list', function() {
 
 /* manager */
 engine_editor = function() {
+    
     this.selected_layer = null;
     this.layers = {};
     this.layer_order = [];
+    this.get_json = function() {
+        var json = {};
+        json.layers = {};
+        for(layer in this.layers) {
+            json.layers[layer] = this.layers[layer].get_json();
+        }
+        json.resources = {};
+        json.resources.images = {};
+        for (img in this.resources.imgs) {
+            json.resources.images[img] = this.resources.imgs[img].get_json();
+        }
+        json.viewport = this.viewport.get_json();
+        return json;
+    }
     this.add_layer = function(name, overlay, persistant, width, height, left, top) {
         if (this.layers[name]) {
             return false;
@@ -642,9 +722,24 @@ engine_editor = function() {
             ele.css('height', this.height);
             ele.css('background', this.background_color);
             ele.css('opacity', 0);
+            $('#editor').html('');
             $('#editor').append(ele);
             ele.fadeTo(1000, 1);
             draw_grid(this.grid_w, this.grid_h, this.grid_color);
+        },
+        get_json: function() {
+            var json = {
+                left: 0,
+                top: 0,
+                width: this.width,
+                height: this.height,
+                show_grid: this.show_grid,
+                grid_color: this.grid_color,
+                grid_width: this.grid_w,
+                grid_height: this.grid_h,
+                background_color: this.background_color
+            }
+            return json;
         }
     }
     this.resources = {
@@ -692,5 +787,61 @@ engine_editor = function() {
             ctx.drawImage(img, 0, 0);
         }
     }
+    this.files = {
+        current_file : '',
+        storage: window.localStorage,
+        save_as: function(filename) {
+            if (this.storage[filename]) {
+                console.log('filename already taken!!');
+                return false;
+            } else {
+                var json = JSON.stringify(window.edit.get_json());
+                return this.storage.setItem(filename, json);
+            }
+        },
+        save: function() {
+            if (this.current_file != '') {
+                var json = JSON.stringify(window.edit.get_json());
+                return this.storage.setItem(this.current_file, json);
+            } else {
+                return false;
+            }
+        },
+        get_files: function() {
+            var keys = [];
+            for (var i = 0; i < this.storage.length; i++) {
+                keys.push(this.storage.key(i));
+            }
+            return keys;
+        },
+        load_file: function(key) {
+            console.log('loading file...' + key);
+            var json = this.storage.getItem(key);
+            if (json == undefined) {
+                console.log('oh no something broke...');
+            } else {
+                this.parse_json(json);
+                this.current_file = key;
+                $('#header-filename').html(key);
+            }
+        },
+        parse_json: function(json) {
+            var data = JSON.parse(json);
+            window.edit.viewport.grid_color = data.viewport.grid_color;
+            window.edit.viewport.left = data.viewport.left,
+            window.edit.viewport.top = data.viewport.top
+            window.edit.viewport.set_props(data.viewport.width, data.viewport.height, data.viewport.background_color);
+            for (layer in data.layers) {
+                var lay = data.layers[layer];
+                window.edit.add_layer(lay.name, lay.overlay, lay.persistant, lay.width, lay.height, lay.left, lay.top);
+            }
+            for (img in data.resources.images) {
+                var image = data.resources.images[img];
+                window.edit.resources.add_img(image.name, image.source);
+            }
+        }
+    }
 }
+
+
 

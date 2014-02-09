@@ -18,17 +18,102 @@
 </head>
 <body>
     <div id='area-container'>
+        <div id='saveas-modal' class='modal fade'>
+            <div class='modal-dialog'>
+                <div class='modal-content'>
+                    <div class='modal-header'>
+                        <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+                        <h4 class='modal-title'>
+                        <span class='glyphicon glyphicon-floppy-save'></span> save as</h4>
+                    </div>
+                    <div class='modal-body'>
+                        <div class='form-group'>
+                            <input type='text' class='form-control' placeholder='filename' id='saveas-file-name'>
+                        </div>
+                    </div>
+                    <div class='modal-footer'>
+                        <button type='button' class='btn btn-default' data-dismiss='modal'> close</button>
+                        <button type='button' class='btn btn-primary' id='btn-file-saveas'> save </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id='open-modal' class='modal fade'>
+            <div class='modal-dialog'>
+                <div class='modal-content'>
+                    <div class='modal-header'>
+                        <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+                        <h4 class='modal-title'>
+                        <span class='glyphicon glyphicon-floppy-open'></span> open </h4>
+                    </div>
+                    <div class='modal-body'>
+                        <div class='well' id='file-open-list-container'>
+                            <ul class='list-group' id='file-open-list'>
+                            
+                            </ul>
+                        </div>
+                    </div>
+                    <div class='modal-footer'>
+                        <button type='button' class='btn btn-default' data-dismiss='modal'>close</button>
+                        <button type='button' class='btn btn-primary' id='btn-file-open'> open </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id='setjson-modal' class='modal fade'>
+            <div class='modal-dialog'>
+                <div class='modal-content'>
+                    <div class='modal-header'>
+                        <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+                        <h4 class='modal-title'>
+                        <span class='glyphicon glyphicon-save'></span> input json</h4>
+                    </div>
+                    <div class='modal-body'>
+                        <p> enter your json in the text area </p>
+                        <textarea class='form-control' rows='3'></textarea>
+                    </div>
+                    <div class='modal-footer'>
+                        <button type='button' class='btn btn-default' data-dismiss='modal'>close</button>
+                        <button type='button' class='btn btn-primary' id='file-json-load'> load </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id='getjson-modal' class='modal fade'>
+            <div class='modal-dialog'>
+                <div class='modal-content'>
+                    <div class='modal-header'>
+                        <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+                        <h4 class='modal-title'>
+                        <span class='glyphicon glyphicon-open'></span> input json</h4>
+                    </div>
+                    <div class='modal-body'>
+                        <p> below is the json for this file </p>
+                        <textarea class='form-control' rows='3'></textarea>
+                    </div>
+                    <div class='modal-footer'>
+                        <button type='button' class='btn btn-default' data-dismiss='modal'>close</button>
+                        <button type='button' class='btn btn-primary' id='file-json-open'> load </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id='area-top'>
             <div id='area-header'>
-                <h4 id='main-header'>engine.er: <strong>filename.js</strong></h4>
-                <div class='btn-group btn-group-xs' id='file-controls'>
-                    <button type='button' class='btn btn-default'> load <span class='glyphicon glyphicon-open'></span></button>
-                    <button type='button' class='btn btn-default'> save <span class='glyphicon glyphicon-save'></span></button>
+                <h4 id='main-header'>engine.er: <strong id='header-filename'>untitled</strong></h4>   
+                <div class='btn-group btn-group-xs header-controls' id='file-controls'>
+                    <button type='button' class='btn btn-default' id='btn-load' title='load' data-toggle='modal' data-target='#open-modal'><span class='glyphicon glyphicon-floppy-open'></span></button>
+                    <button type='button' class='btn btn-default' id='btn-saveas' title='save as' data-toggle='modal' data-target='#saveas-modal'><span class='glyphicon glyphicon-floppy-save'></span></button>
+                    <button type='button' class='btn btn-default' id='btn-save' title='save'><span class='glyphicon glyphicon-floppy-disk'></span></button>
                 </div>
-                <div class='btn-group btn-group-xs' id='game-controls'>
-                    <button type='button' class='btn btn-default'><span class='glyphicon glyphicon-play'></span></button>
-                    <button type='button' class='btn btn-default'><span class='glyphicon glyphicon-pause'></span></button>
-                    <button type='button' class='btn btn-default'><span class='glyphicon glyphicon-stop'></span></button>
+                <div class='btn-group btn-group-xs header-controls' id='json-controls'>
+                    <button type='button' class='btn btn-default' id='btn-getjson' title='get json' data-toggle='modal' data-target='#getjson-modal'><span class='glyphicon glyphicon-open'></span></button>
+                    <button type='button' class='btn btn-default' id='btn-setjson' title='set json' data-toggle='modal' data-target='#setjson-modal'><span class='glyphicon glyphicon-save'></span></button>
+                </div>
+                <div class='btn-group btn-group-xs header-controls' id='game-controls'>
+                    <button type='button' class='btn btn-default' title='play'><span class='glyphicon glyphicon-play'></span></button>
+                    <button type='button' class='btn btn-default' title='pause'><span class='glyphicon glyphicon-pause'></span></button>
+                    <button type='button' class='btn btn-default' title='stop'><span class='glyphicon glyphicon-stop'></span></button>
                 </div>
             </div>
         </div>
