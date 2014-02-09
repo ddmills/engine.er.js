@@ -53,7 +53,7 @@ body {
 
 /* editor layers */
 .editor-layer-container {
-    outline: 2px solid grey;
+    outline: 2px solid white;
     position: absolute;
 }
 .editor-layer-container-selected {
@@ -68,7 +68,7 @@ body {
     position: absolute;
     left: 4px;
     top: 4px;
-    color: grey;
+    color: white;
     display: hidden;
 }
 

@@ -47,8 +47,6 @@ View_Layer = function(name, overlay, persistant, order, width, height, left, top
     
     this.set_order(order);
     
-    this.ele_container_div.css('z-index', this.z_order);
-    
     this.ele_content_div.css('opacity', '0');
     this.ele_text_div.css('opacity', '0');
     
@@ -77,11 +75,15 @@ View_Layer.prototype.move_down = function() {
 }
 View_Layer.prototype.set_name = function(new_name) {
     $('#title-layer-edit-' + this.name).html(new_name);
+    this.ele_text_div.html(new_name);
+    this.ele_container_div.attr('id', 'editor-layer-container-' + new_name);
+    this.ele_content_div.attr('id', 'editor-layer-contents-' + new_name);
     $('#layer-view-' + this.name).attr('id', 'layer-view-' + new_name);
     $('#title-layer-edit-' + this.name).attr('id', 'title-layer-edit-' + new_name);
     $('#btn-layer-edit-' + this.name).attr('id', 'btn-layer-edit-' + new_name);
     $('#btn-layer-up-' + this.name).attr('id', 'btn-layer-up-' + new_name);
     $('#btn-layer-down-' + this.name).attr('id', 'btn-layer-down-' + new_name);
+    $('#btn-layer-vis-' + this.name).attr('id', 'btn-layer-vis-' + new_name);
     this.name = new_name;
 }
 View_Layer.prototype.set_visibility = function(visibility) {
@@ -89,17 +91,36 @@ View_Layer.prototype.set_visibility = function(visibility) {
     if (this.visible) {
         this.ele_content_div.fadeTo(200, 1);
         this.ele_text_div.fadeTo(200, 1);
-        this.ele_container_div.css('outline', '2px solid grey');
+        this.ele_container_div.css('outline', '2px solid white');
     } else {
         this.ele_content_div.fadeTo(200, 0);
         this.ele_text_div.fadeTo(200, .25);
-        this.ele_container_div.css('outline', '2px dotted grey');
+        this.ele_container_div.css('outline', '2px dotted white');
     }
 }
 View_Layer.prototype.set_order = function(order) {
     this.order = order;
     this.z_order = 100 - this.order;
     this.ele_container_div.css('z-index', this.z_order);
+}
+View_Layer.prototype.settings = function(name, overlay, persistant, width, height, left, top) {
+    this.set_name(name);
+    this.overlay = overlay;
+    this.persistant = persistant;
+    this.width = width;
+    this.height = height;
+    this.x = left;
+    this.y = top;
+    
+    this.ele_content_div.css('height', this.height + 'px');
+    this.ele_content_div.css('width', this.width + 'px');
+    
+    this.ele_container_div.css('left', this.x + 'px');
+    this.ele_container_div.css('top', this.y + 'px');
+    
+}
+View_Layer.prototype.remove = function() {
+    this.ele_container_div.remove();
 }
 
 $(window).ready(function() {
@@ -133,13 +154,11 @@ var delay = (function() {
     timer = setTimeout(callback, ms);
   };
 })();
-
 $(window).resize(function() {
     delay(function(){
         resize_editor();
     }, 500);
 });
-
 wait_for_resize = function() {
     if ($('#area-left').css('height') == '0px') {
         setTimeout(wait_for_resize, .2);
@@ -148,7 +167,6 @@ wait_for_resize = function() {
         resize_editor();
     }
 };
-
 resize_editor = function() {
     var area_w = $('#area-left').width();
     var area_h = $('#area-left').height();
@@ -373,6 +391,8 @@ layer_edit_form_set = function(name) {
     $('#layer-edit-form-name').val(name);
     $('#layer-edit-form-width').val(lay.width);
     $('#layer-edit-form-height').val(lay.height);
+    $('#layer-edit-form-left').val(lay.x);
+    $('#layer-edit-form-top').val(lay.y);
     $('#layer-edit-form-name').data('lay_name', name);
     if (lay.overlay) {
         $('span', $('#uniform-layer-edit-form-overlay')).addClass('checked');
@@ -412,6 +432,8 @@ $(document).on('click', '#edit-layer-confirm', function() {
     var persistant =$('#layer-edit-form-persistant').prop('checked');
     var width = $('#layer-edit-form-width').val();
     var height = $('#layer-edit-form-height').val();
+    var left = $('#layer-edit-form-left').val();
+    var top = $('#layer-edit-form-top').val();
     if (name == '') {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
@@ -428,12 +450,9 @@ $(document).on('click', '#edit-layer-confirm', function() {
     } else if (window.edit.layers[name] == undefined) {
         var layer = window.edit.layers[old_name];
         window.edit.layers[name] = layer;
-        layer.set_name(name);
         delete window.edit.layers[old_name];
-        layer.overlay = overlay;
-        layer.persistant = persistant;
-        layer.width = width;
-        layer.height = height;
+        layer.settings(name, persistant, overlay, width, height, left, top);
+        resize_editor();
         window.edit.layer_order[layer.order] = name;
         var html = "<div class='alert alert-success alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
@@ -451,10 +470,8 @@ $(document).on('click', '#edit-layer-confirm', function() {
         $('#layer-edit-err').html(html);
         return false;
     } else {
-        window.edit.layers[name].overlay = overlay;
-        window.edit.layers[name].persistant = persistant;
-        window.edit.layers[name].height = height;
-        window.edit.layers[name].width = width;
+        window.edit.layers[old_name].settings(name, persistant, overlay, width, height, left, top);
+        resize_editor();
         var html = "<div class='alert alert-success alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
             "layer " + name + " updated." +
@@ -494,11 +511,11 @@ engine_editor = function() {
             var html = "<div class='layer-view' id='layer-view-" + name + "'>" +
                 "<p class='layer-view-title' id='title-layer-edit-" + name +  "'>" + name + "</p>" +
                 "<div class='btn-group layer-controls'>" +
-                    "<button type='button' class='btn btn-default btn-xs btn-layer-vis' id='btn-layer-vis-"+ name +"'><span class='glyphicon glyphicon-eye-open'></span></button>" +
-                    "<button type='button' class='btn btn-default btn-xs btn-layer-edit' id='btn-layer-edit-"+ name +"'><span class='glyphicon glyphicon-pencil'></span></button>" +
-                    "<button type='button' class='btn btn-default btn-xs btn-layer-delete' id='btn-layer-delete-"+ name +"'><span class='glyphicon glyphicon-trash'></span></button>" +
-                    "<button type='button' class='btn btn-default btn-xs btn-layer-up' id='btn-layer-up-"+ name +"'><span class='glyphicon glyphicon-chevron-up'></span></button>" +
-                    "<button type='button' class='btn btn-default btn-xs btn-layer-down' id='btn-layer-down-"+ name +"'><span class='glyphicon glyphicon-chevron-down'></span></button>" +
+                    "<button title='show or hide' type='button' class='btn btn-default btn-xs btn-layer-vis' id='btn-layer-vis-"+ name +"'><span class='glyphicon glyphicon-eye-open'></span></button>" +
+                    "<button title='edit properties' type='button' class='btn btn-default btn-xs btn-layer-edit' id='btn-layer-edit-"+ name +"'><span class='glyphicon glyphicon-pencil'></span></button>" +
+                    "<button title='delete' type='button' class='btn btn-default btn-xs btn-layer-delete' id='btn-layer-delete-"+ name +"'><span class='glyphicon glyphicon-trash'></span></button>" +
+                    "<button title='move up' type='button' class='btn btn-default btn-xs btn-layer-up' id='btn-layer-up-"+ name +"'><span class='glyphicon glyphicon-chevron-up'></span></button>" +
+                    "<button title='move down' type='button' class='btn btn-default btn-xs btn-layer-down' id='btn-layer-down-"+ name +"'><span class='glyphicon glyphicon-chevron-down'></span></button>" +
                 "</div>" +
             "</div>";
             this.layers[name] = new View_Layer(name, overlay, persistant, this.layer_order.length, width, height, left, top);
@@ -510,11 +527,11 @@ engine_editor = function() {
     }
     this.remove_layer = function(name) {
         $('#layer-view-' + name).remove();
+        this.layers[name].remove();
         delete this.layer_order[this.layers[name].order];
         delete this.layers[name];
         this.layer_order = this.layer_order.filter(function (item) { return item != undefined });
         for (var i = 0; i < this.layer_order.length; i++) {
-            console.log(i + ' ' + this.layer_order[i]);
             this.layers[this.layer_order[i]].order = i;
             
         }
@@ -555,6 +572,7 @@ engine_editor = function() {
             $('#editor-viewport').css('height', this.height);
             $('#editor-viewport').css('background', this.background_color);
             draw_grid(this.grid_w, this.grid_h, this.grid_color);
+            resize_editor();
         },
         add_viewport : function(w, h) {
             var ele = $("<div id='editor-viewport'></div>");
