@@ -767,8 +767,6 @@ engine_editor = function() {
             var opt = $("<option value='img-thumb-" + name + "'>" + name +"</option>");
             $('#image-list').append(opt);
             $('#images-thumbs').show(500);
-
-            console.log(name + ' image loaded');
             this.draw_thumb(name);
         },
         img_error: function(img) {
@@ -830,6 +828,8 @@ engine_editor = function() {
             window.edit.viewport.grid_color = data.viewport.grid_color;
             window.edit.viewport.left = data.viewport.left,
             window.edit.viewport.top = data.viewport.top
+            window.edit.viewport.grid_w = data.viewport.grid_width;
+            window.edit.viewport.grid_h = data.viewport.grid_height;
             window.edit.viewport.set_props(data.viewport.width, data.viewport.height, data.viewport.background_color);
             for (layer in data.layers) {
                 var lay = data.layers[layer];
@@ -839,7 +839,11 @@ engine_editor = function() {
                 var image = data.resources.images[img];
                 window.edit.resources.add_img(image.name, image.source);
             }
+        },
+        delete_file: function(key) {
+            
         }
+        
     }
 }
 
