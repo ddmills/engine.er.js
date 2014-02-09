@@ -129,16 +129,16 @@
                         <li class='navtab active' id='goto-layers' title='layers'><a><span class='glyphicon glyphicon-file'></span> </a></li>
                         <li class='navtab' id='goto-entities' title='entities'><a><span class='glyphicon glyphicon-heart'></span> </a></li>
                         <li class='navtab' id='goto-settings' title='settings'><a><span class='glyphicon glyphicon-wrench'></span> </a></li>
-                        <li class='navtab' id='goto-resources' title='resources'><a><span class='glyphicon glyphicon-tree-deciduous'></span> </a></li>
+                        <li class='navtab' id='goto-resources' title='resources'><a><span class='glyphicon glyphicon-leaf'></span> </a></li>
+                        <li class='navtab' id='goto-components' title='components'><a><span class='glyphicon glyphicon-tree-deciduous'></span> </a></li>
                     </ul>
                     <div id='shelf-layers' class='shelf-main'>
                         <div id='shelf-layer-view'>
                             <h3><span class='glyphicon glyphicon-file'></span> layers </h3>
                             <hr>
-                            <h4> layer list </h4>
-                            <div id='layer-view-err'></div>
-                            <div id='layer-view-notify'></div>
-                            <div class='well' id='layer-list'></div>
+                            <div id='layer-view-err' class='alert-area'></div>
+                            <div id='layer-view-notify' class='alert-area'></div>
+                            <div class='well big-list' id='layer-list'></div>
                             <button type='button' class='btn btn-default' id='view-layer-add'>
                                 <span class='glyphicon glyphicon-plus'></span> add layer
                             </button>
@@ -148,7 +148,7 @@
                             <span id='btn-layer-add-back' title='back to layers' class='btn-back glyphicon glyphicon-circle-arrow-left'></span>
                             <span class='glyphicon glyphicon-file'></span> new layer </h3>
                             <hr>
-                            <div id='layer-add-err'></div>
+                            <div id='layer-add-err' class='alert-area'></div>
                             <div class='form-group well'>
                                 <label for='layer-add-form-name'>name</label>
                                 <input type='text' class='form-control' id='layer-add-form-name' value='name'>
@@ -192,7 +192,7 @@
                             <span id='btn-layer-edit-back' title='back to layers' class='btn-back glyphicon glyphicon-circle-arrow-left'></span>
                             <span class='glyphicon glyphicon-file'></span>edit layer</h3>
                             <hr>
-                            <div id='layer-edit-err'></div>
+                            <div id='layer-edit-err' class='alert-area'></div>
                             <div class='form-group well'>
                                 <label for='layer-edit-form-name'>name</label>
                                 <input type='text' class='form-control' id='layer-edit-form-name' value='name'>
@@ -235,7 +235,7 @@
                     <div id='shelf-viewport' class='shelf-main'>
                         <h3><span class='glyphicon glyphicon-camera'></span> viewport </h3>
                         <hr>
-                        <div id='viewport-notify'></div>
+                        <div id='viewport-notify' class='alert-area'></div>
                         <div class='form-group well' id='viewport-form'>
                             <label for='viewport-width'>width</label>
                             <input type='text' class='form-control int-only' id='viewport-width' value='640'>
@@ -257,7 +257,7 @@
                     </div>
                     <div id='shelf-settings' class='shelf-main'>
                         <div id='shelf-settings-all'>
-                            <div id='settings-all-notify'></div>
+                            <div id='settings-all-notify' class='alert-area'></div>
                             <h3><span class='glyphicon glyphicon-wrench'></span> settings </h3>
                             <hr>
                             <button type='button' class='btn btn-default' id='btn-settings-grid'>
@@ -291,20 +291,20 @@
                     </div>
                     <div id='shelf-resources' class='shelf-main'>
                         <div id='shelf-resources-all'>
-                            <div id='resources-all-notify'></div>
-                            <h3><span class='glyphicon glyphicon-tree-deciduous'></span> resources </h3>
+                            <div id='resources-all-notify' class='alert-area'></div>
+                            <h3><span class='glyphicon glyphicon-leaf'></span> resources </h3>
                             <hr>
                             <button type='button' class='btn btn-default' id='btn-resources-images'>
-                            <span class='glyphicon glyphicon-picture'></span> images
+                                <span class='glyphicon glyphicon-picture'></span> images
                             </button>
                             <button type='button' class='btn btn-default' id='btn-resources-sprites'>
-                            <span class='glyphicon glyphicon-send'></span> sprites
+                                <span class='glyphicon glyphicon-send'></span> sprites
                             </button>
                             <button type='button' class='btn btn-default' id='btn-resources-sounds'>
-                            <span class='glyphicon glyphicon-volume-up'></span> sounds
+                                <span class='glyphicon glyphicon-volume-up'></span> sounds
                             </button>
                             <button type='button' class='btn btn-default' id='btn-resources-particles'>
-                            <span class='glyphicon glyphicon-fire'></span> particles
+                                <span class='glyphicon glyphicon-fire'></span> particles
                             </button>
                         </div>
                         <div id='shelf-resources-images'>
@@ -312,11 +312,13 @@
                             <span id='btn-resources-images-back' title='back to resources' class='btn-back glyphicon glyphicon-circle-arrow-left'></span>                        
                             <span class='glyphicon glyphicon-picture'></span> images </h3>
                             <hr>
-                            <div id='resources-images-notify'></div>
+                            <div id='resources-images-notify' class='alert-area'></div>
                             <div class='well' id='images-thumbs'>
-                                <canvas id='image-thumb'>
-                                <select id='image-list'></select>
+                                <canvas id='image-thumb'></canvas>
+                                <div class='big-list' id='res-images-list'></div>
                             </div>
+                            
+                            
                             
                             <div class='form-group well' id='add-image-form'>
                                 <label for='image-add-path'>image path</label>
@@ -329,7 +331,7 @@
                             </div>
                         </div>
                         <div id='shelf-resources-sprites'>
-                            <div id='resources-sprites-notify'></div>
+                            <div id='resources-sprites-notify' class='alert-area'></div>
                             <h3>
                             <span id='btn-resources-sprites-back' title='back to resources' class='btn-back glyphicon glyphicon-circle-arrow-left'></span>
                             <span class='glyphicon glyphicon-send'></span> sprites </h3>
@@ -337,6 +339,14 @@
                             <button type='button' class='btn btn-default' id='btn-resources-sprites-add'>
                                 <span class='glyphicon glyphicon-plus'></span> add sprite
                             </button>
+                        </div>
+                    </div>
+                    <div id='shelf-components' class='shelf-main'>
+                        <div id='shelf-components-all'>
+                            <div id='components-all-notify' class='alert-area'></div>
+                            <h3><span class='glyphicon glyphicon-tree-deciduous'></span> components </h3>
+                            <hr>
+                            
                         </div>
                     </div>
                 </div>

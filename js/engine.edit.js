@@ -266,6 +266,14 @@ resize_editor = function() {
 
 }
 
+$(document).on('DOMSubtreeModified', '.alert-area', function(e) {
+    var child = $(this).children();
+    setTimeout(function() {
+        child.slideUp(2000);
+    }, 2000);
+});
+
+
 /* form control */
 $(document).on('click', '#btn-settings-grid', function() {
     $('#shelf-settings-all').hide(200);
@@ -371,10 +379,9 @@ $(document).on('click', '#view-layer-add', function() {
     layer_add_form_clear();
     $('#shelf-layer-add').show(200);
 });
-$(document).on('click', '.layer-view', function() {
+$(document).on('click', '#layer-list > .big-list-item', function() {
     var name = $(this).children('p').html();
     window.edit.select_layer(name);
-    
 });
 /* add layer */
 layer_add_form_clear = function() {
@@ -415,8 +422,13 @@ $(document).on('click', '#add-layer-confirm', function() {
         "</div>";
         $('#layer-add-err').html(html);
     } else if (window.edit.add_layer(name, overlay, persistant, width, height, left, top)) {
-       $('#shelf-layer-add').hide(200);
-       $('#shelf-layer-view').show(200);
+        var html = "<div class='alert alert-success alert-dismissable'>" +
+            "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
+            "layer " + name + " created" +
+        "</div>";
+        $('#layer-view-notify').html(html);
+        $('#shelf-layer-add').hide(200);
+        $('#shelf-layer-view').show(200);
     } else {
         var html = "<div class='alert alert-danger alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
@@ -515,7 +527,7 @@ $(document).on('click', '#edit-layer-confirm', function() {
         resize_editor();
         var html = "<div class='alert alert-success alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
-            "layer " + name + " updated." +
+            "layer " + name + " updated" +
         "</div>";
         $('#layer-view-notify').html(html);
         $('#shelf-layer-edit').hide(200);
@@ -540,6 +552,19 @@ $(document).on('click', '#btn-resources-images-back', function() {
 $(document).on('click', '#btn-resources-sprites-back', function() {
     $('#shelf-resources-sprites').hide(200);
     $('#shelf-resources-all').show(200);
+});
+$(document).on('click', '#image-add-confirm', function() {
+    var source = $('#image-add-path').val()
+    var name = $('#image-add-name').val()
+    window.edit.resources.add_img(name, source);
+});
+$(document).on('click', '#res-images-list > .big-list-item', function() {
+    console.log(this);
+    var name = $(this).children('p').html();
+    $('#res-images-list > .big-list-item-selected').removeClass('big-list-item-selected');
+    $(this).addClass('big-list-item-selected');
+    console.log(name);
+    window.edit.resources.draw_thumb(name);
 });
 
 /* load and save */
@@ -591,26 +616,16 @@ $(document).on('click', '#viewport-confirm', function() {
     var h = $('#viewport-height').val();
     var c = $('#viewport-bkg-color').val();
     window.edit.viewport.set_props(w, h, c);
-    var html = "<div class='alert alert-success alert-dismissable'>" +
+    var ele = $("<div class='alert alert-success alert-dismissable'>" +
             "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>" +
             "viewport updated" +
-        "</div>";
-    $('#viewport-notify').html(html);
+        "</div>");
+    $('#viewport-notify').append(ele);
 });
 $(document).on('click', '#viewport-cancel', function() {
     var w = $('#viewport-width').val(window.edit.viewport.width);
     var h = $('#viewport-height').val(window.edit.viewport.height);
     var c = $('#viewport-bkg-color').val(window.edit.viewport.background_color);
-});
-$(document).on('click', '#image-add-confirm', function() {
-    var source = $('#image-add-path').val()
-    var name = $('#image-add-name').val()
-    window.edit.resources.add_img(name, source);
-});
-$(document).on('change', '#image-list', function() {
-    var name = $(this).val().substr(9, $(this).val().length);
-    console.log(name);
-    window.edit.resources.draw_thumb(name);
 });
 
 /* manager */
@@ -637,8 +652,8 @@ engine_editor = function() {
         if (this.layers[name]) {
             return false;
         } else {
-            var html = "<div class='layer-view' id='layer-view-" + name + "'>" +
-                "<p class='layer-view-title' id='title-layer-edit-" + name +  "'>" + name + "</p>" +
+            var html = "<div class='big-list-item layer-item' id='layer-view-" + name + "'>" +
+                "<p class='big-list-item-title' id='title-layer-edit-" + name +  "'>" + name + "</p>" +
                 "<div class='btn-group layer-controls'>" +
                     "<button title='show or hide' type='button' class='btn btn-default btn-xs btn-layer-vis' id='btn-layer-vis-"+ name +"'><span class='glyphicon glyphicon-eye-open'></span></button>" +
                     "<button title='edit properties' type='button' class='btn btn-default btn-xs btn-layer-edit' id='btn-layer-edit-"+ name +"'><span class='glyphicon glyphicon-pencil'></span></button>" +
@@ -650,6 +665,7 @@ engine_editor = function() {
             this.layers[name] = new View_Layer(name, overlay, persistant, this.layer_order.length, width, height, left, top);
             this.layer_order.push(name);
             $('#layer-list').append(html);
+            this.select_layer(name);
             resize_editor();
             return true;
         }
@@ -684,15 +700,17 @@ engine_editor = function() {
             e1.after(e2);
     }
     this.select_layer = function(name) {
-        $('.layer-view-selected').removeClass('layer-view-selected');
-        $('.editor-layer-container-selected').removeClass('editor-layer-container-selected');
-        $('.editor-layer-text-selected').removeClass('editor-layer-text-selected');
-        $('#editor-layer-container-' + name).addClass('editor-layer-container-selected');
-        
-        $('#layer-view-' + name).addClass('layer-view-selected');
-        layer = this.layers[name].ele_text_div.addClass('editor-layer-text-selected');
-        this.selected_layer = layer;
-        
+        if (this.layers[name] != undefined) {
+            $('#layer-list > .big-list-item-selected').removeClass('big-list-item-selected');
+            $('.editor-layer-container-selected').removeClass('editor-layer-container-selected');
+            $('.editor-layer-text-selected').removeClass('editor-layer-text-selected');
+            $('#editor-layer-container-' + name).addClass('editor-layer-container-selected');
+            $('#layer-view-' + name).addClass('big-list-item-selected');
+            layer = this.layers[name].ele_text_div.addClass('editor-layer-text-selected');
+            this.selected_layer = layer;
+        } else {
+            this.selected_layer = null;
+        }
     }
     this.viewport = {
         left: 0,
@@ -763,9 +781,11 @@ engine_editor = function() {
                 "</div>";
             $('#resources-images-notify').html(html);
             this.imgs[name] = img;
-            
-            var opt = $("<option value='img-thumb-" + name + "'>" + name +"</option>");
-            $('#image-list').append(opt);
+            var opt = $("<div class='big-list-item' id='res-image-item-" + name + "'>" +
+                "<p class='big-list-item-title' id='title-res-image-" + name +  "'>" + name + "</p>" +
+                "</div>");
+
+            $('#res-images-list').append(opt);
             $('#images-thumbs').show(500);
             this.draw_thumb(name);
         },
@@ -777,12 +797,14 @@ engine_editor = function() {
             console.log(img.name + ' failed to load');
         },
         draw_thumb : function(name) {
-            var img = this.imgs[name].img;
-            var ctx = this.thumb_can[0].getContext('2d');
-            var w = this.thumb_can.css('width');
-            var h = this.thumb_can.css('height');
-            ctx.clearRect(0, 0, w, h);
-            ctx.drawImage(img, 0, 0);
+            if(this.imgs[name] != undefined) {
+                var img = this.imgs[name].img;
+                var ctx = this.thumb_can[0].getContext('2d');
+                var w = this.thumb_can.css('width');
+                var h = this.thumb_can.css('height');
+                ctx.clearRect(0, 0, 200, 200);
+                ctx.drawImage(img, 0, 0);
+            }
         }
     }
     this.files = {
