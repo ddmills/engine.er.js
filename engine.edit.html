@@ -8,6 +8,7 @@
     <script src='./js/bootstrap.min.js'></script>
     <script src='./js/bootstrap-select.min.js'></script>
     <script src='./js/simple-color-picker.min.js'></script>
+    <script src='./js/lineage.js'></script>
     <script src='./engine.er.js'></script>
     <script src='./js/engine.edit.js'></script>
     
@@ -273,7 +274,7 @@
                         <div id='shelf-settings-grid'>
                             <canvas id='canvas-create-grid'></canvas>
                             <h3>
-                            <span id='btn-resources-images-back' title='back to settings' class='btn-back glyphicon glyphicon-circle-arrow-left'></span>
+                            <span id='btn-settings-grid-back' title='back to settings' class='btn-back glyphicon glyphicon-circle-arrow-left'></span>
                             <span class='glyphicon glyphicon-th-large'></span> editor grid settings </h3>
                             <hr>
                             <div class='form-group well' id='grid-settings-form'>
@@ -321,6 +322,7 @@
                                 <div class='big-list' id='res-images-list'></div>
                             </div>   
                             <div class='form-group well' id='add-image-form'>
+                                <h4> add image </h4>
                                 <label for='image-add-path'>image path</label>
                                 <input type='text' class='form-control' id='image-add-path' placeholder='./imgs/...'>
                                 <label for='image-add-name'>name</label>
@@ -351,9 +353,11 @@
                                     <span class='glyphicon glyphicon-plus'></span> add component
                             </button>
                         </div>
-                        <div id='shelf-components-create'>
-                            <div id='components-create-notify' class='alert-area'></div>
-                            <h3><span class='glyphicon glyphicon-tree-deciduous'></span> add component </h3>
+                        <div id='shelf-components-add'>
+                            <div id='components-add-notify' class='alert-area'></div>
+                            <h3>
+                            <span id='btn-component-add-back' title='back to components' class='btn-back glyphicon glyphicon-circle-arrow-left'></span>
+                            <span class='glyphicon glyphicon-tree-deciduous'></span> add component </h3>
                             <hr>
                             <div class='form-group well' id='comp-add-form'>
                                 <label for='comp-add-name'>name</label>
@@ -369,18 +373,12 @@
                                 <div class='well form-group-sub'>
                                 
                                     <div class='comp-disptype' id='comp-add-displaytype-sprite-opitons'>
-                                    </div>
-                                    
+                                    </div>                             
                                     <div class='comp-disptype' id='comp-add-displaytype-image-options'>
                                         <label for='comp-add-image-res'> image resource</label>
                                         <select class='form-control' id='comp-add-image-res' value=''>
                                         </select>
-                                        <label for='comp-add-image-width'>width</label>
-                                        <input type='text' class='form-control int-only' id='comp-add-image-width' value='32'>
-                                        <label for='comp-add-image-height'>height</label>
-                                        <input type='text' class='form-control int-only' id='comp-add-image-height' value='32'>
                                     </div>
-                                    
                                     <div class='comp-disptype' id='comp-add-displaytype-text-options'>
                                         <label for='comp-add-text-text'> text </label>
                                         <input type='text' class='form-control' id='comp-add-text-text' value='sometext'>
@@ -391,7 +389,6 @@
                                         <label for='comp-add-text-color'>color</label>
                                         <input type='text' class='form-control input-color' id='comp-add-text-color' value='white'>
                                     </div>
-                                    
                                     <div class='comp-disptype' id='comp-add-displaytype-none-options'>
                                         <label for='comp-add-none-width'>editor width</label>
                                         <input type='text' class='form-control int-only' id='comp-add-none-width' value='32'>
@@ -400,8 +397,14 @@
                                         <label for='comp-add-none-editcolor'>editor color</label>
                                         <input type='text' class='form-control input-color' id='comp-add-none-editcolor' value='blue'>
                                     </div>
-                                 
+
                                 </div>
+                                <div id='comp-add-properties' class='properties-table row'>
+                                    <div class='col-md-3'><input type='text' class='form-control' id='comp-add-key' placeholder='key'></div>
+                                    <div class='col-md-6'><input type='text' class='form-control' id='comp-add-val' placeholder='value'></div>
+                                    <div class='col-md-3'><button type='button' class='btn btn-default' id='btn-comp-add-key'> add key/value </button></div>
+                                </div>
+                                
                                 <button type='button' class='btn btn-default' id='component-add-cancel'>
                                     <span class='glyphicon glyphicon-remove'></span> cancel
                                 </button>

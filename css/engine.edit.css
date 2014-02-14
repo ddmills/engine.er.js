@@ -84,7 +84,6 @@ body {
     box-shadow: none;
 }
 
-
 /* edit window */
 #editor-viewport {
     box-shadow: 0px 0px 4px 1px #101010;
@@ -125,14 +124,18 @@ body {
 /* file browser */
 .list-file-item-selected {
     background: grey;
+    box-shadow: 0px 0px 4px #4C86C1;
+}
+.list-file-item:hover {
+    cursor: pointer;
+    box-shadow: 0px 0px 3px #4C86C1;
 }
 
 /* big list component */
 .big-list {
     width: 100%;
     min-height: 50px;
-    max-height: 250px;
-    max-height: 300px;
+    max-height: 200px;
     margin-bottom: 4px;
     margin-top: 2px;
     overflow-y: auto;
@@ -172,6 +175,8 @@ body {
 /* nav tabs */
 .navtab {
     cursor: pointer;
+    width: 15%;
+    height: 35px;
     padding-left: 2px;
     padding-right: 2px;
 }
@@ -183,6 +188,8 @@ body {
     padding-right: 7px;
     padding-top: 3px;
     padding-bottom: 2px;
+    width: 100%;
+    height: 100%;
 }
 
 /* settings : grid */
@@ -233,7 +240,7 @@ display: none;
 #shelf-components {
     display: none;
 }
-#shelf-components-create {
+#shelf-components-add {
     display: none;
 }
 
@@ -265,6 +272,9 @@ hr {
 }
 h3 {
     margin-top: 4px;
+}
+h4 {
+    font-size: 25spx;
 }
 .btn-back:hover {
     color: #428BCA;
