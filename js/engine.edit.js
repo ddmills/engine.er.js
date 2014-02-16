@@ -1,5 +1,6 @@
 var editor = function(scenario) {
     var e = this;
+    
     this.resize = function() {
         var area_w = $('#area-left').width();
         var area_h = $('#area-left').height();
@@ -283,6 +284,15 @@ var editor = function(scenario) {
         
     }
 
+    this.layers = {
+        init: function() {
+        
+        },
+        add: function() {
+        
+        },
+    }
+    
     this.file.init(scenario);
     this.game.init();
     this.viewport.init();
