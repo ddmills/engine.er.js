@@ -124,7 +124,8 @@ $(document).on('click', '#btn-game-quit', function() {
     edit.game.game_stop();
 });
 $(document).on('click', '#btn-game-start', function() {
-    edit.game.game_start();
+    if (edit.game.game_start())
+        add_alert('game started', 'success', 'editor');
 });
 
 /* viewport shelf */

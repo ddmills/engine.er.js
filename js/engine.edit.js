@@ -153,7 +153,7 @@ var editor = function(scenario) {
             this.grid_height = 16;
             this.grid_color = '#1A1A1A';
             this.ob = e.file.current_scenario.viewport;
-            $('#editor').html('');
+            $('#editor').html("<div id='editor-notify' class='alert-area'></div>");
             this.ele = $("<div id='editor-viewport'></div>");
             this.ele.css('opacity', 0);
             $('#editor').append(this.ele);
