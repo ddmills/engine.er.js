@@ -3,27 +3,66 @@ $(window).ready(function() {
     var g = new eng('mygame');
 
     /* add an image */
-    g.resrc.image({
+    g.resources.image({
         name: 'yum',
         source: './imgs/yum.jpg'
     });
-
-    /* add a component */
-    g.cmpt.define('derp', '_base', function(p, pp) {
-
-        p.image = g.resrc.images.yum;
     
-        p.initialize = function(name, start) {
-            pp.initialize.call(this, name, start);
-        };
+    /* define component named 'herp' derived from '_base' */
+    /* it will automatically use '_base' if left out */
+    g.components.def('herp', '_base', {
         
-        p.draw = function() {
-            pp.draw.call(this);
-        };
+        /* define properties */
+        hiccup: 13,
+        image: 'yum', 
+        
+        /* this is the constructor */
+        initialize: function(game) {
+            /* send it a game variable to add more functionality */
+            this.image = game.resources.images['yum'];
+            /* call the parent constructor */
+            parent.initialize.call(this, 'hello world', {x: 5, y: 10});
+        },
+        
+        /* this is an overridden method */
+        draw: function() {
+            console.log('this is an overridden method');
+            console.log('hiccup ' + this.hiccup);
+            /* call the parents method */
+            parent.draw.call(this);
+            
+        }
         
     });
 
-    var myc = g.cmpt.create('derp', 'myname', {x: 15, y: 2});
+    g.components.def('derp', 'herp', {
+        
+        /* define properties */
+        hiccup: 26,
+        image: 'dope', 
+        
+        /* this is the constructor */
+        initialize: function(game) {
+            console.log('In derp constructor');
+            /* send it a game variable to add more functionality */
+            //this.image = game.resources.images['yum'];
+            /* call the parent constructor */
+            parent.initialize.call(this, game);
+            console.log(this);
+        },
+        
+        /* this is an overridden method */
+        draw: function() {
+            console.log('hiccup ' + this.hiccup);
+            /* call the parents method */
+            //console.log(parent);
+            //parent.parent.draw.call(this);
+            
+        }
+        
+    });
+    
+    var myc = g.components.create('derp', g);
     myc.draw();
     
 });

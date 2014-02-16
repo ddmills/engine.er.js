@@ -48,7 +48,6 @@ body {
     padding: 2px;
     border-bottom: 1px solid #666666;
     background: #D1D1D1;
-    
 }
 
 /* editor layers */
@@ -86,7 +85,7 @@ body {
 
 /* edit window */
 #editor-viewport {
-    box-shadow: 0px 0px 4px 1px #101010;
+    box-shadow: 0px 0px 10px 1px #101010;
     display: block;
     position: relative;
     width: 640px;
@@ -123,7 +122,7 @@ body {
 
 /* file browser */
 .list-file-item-selected {
-    background: grey;
+    background: #E6E6E6;
     box-shadow: 0px 0px 4px #4C86C1;
 }
 .list-file-item:hover {
@@ -198,11 +197,20 @@ body {
 }
 
 /* shelf */
-#area-shelf {
+#area-editing-shelf {
+    position: absolute;
     height : 100%;
     width : 100%;
     padding-top: 5px;
     overflow-y: scroll;
+}
+#area-game-shelf {
+    position: absolute;
+    height : 100%;
+    width : 100%;
+    padding-top: 5px;
+    overflow-y: scroll;
+    display: none;
 }
 .shelf-main {
     padding-top: 4px;
@@ -213,7 +221,7 @@ body {
 #shelf-settings {
     display: none;
 }
-#shelf-viewport {
+#shelf-layers {
     display: none;
 }
 #shelf-entities {
@@ -244,6 +252,17 @@ display: none;
     display: none;
 }
 
+/* game shelf */
+.game-lbl {
+    display: inline;
+}
+#game-fps {
+    display: none;
+}
+#game-time {
+    display: none;
+}
+
 /* add component form */
 .comp-disptype {
     display: none;
@@ -265,6 +284,7 @@ display: none;
     display: none;
     margin: 0px;
 }
+
 /* general */
 hr {
     margin-top: 2px;
@@ -288,4 +308,12 @@ h4 {
     background-color: #E7E7E7;
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
+}
+.alert-area {
+    width: 80%;
+    max-width: 512px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
