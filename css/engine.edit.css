@@ -255,11 +255,16 @@ display: none;
 /* game shelf */
 .game-lbl {
     display: inline;
+    margin: 4px;
+    margin-top: 8px;
 }
 #game-fps {
     display: none;
 }
 #game-time {
+    display: none;
+}
+#game-ms {
     display: none;
 }
 

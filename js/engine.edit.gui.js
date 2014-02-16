@@ -100,11 +100,14 @@ $(document).on('click', '#btn-new', function() {
 });
 
 /* game controls*/
-$(document).on('click', '#btn-game-play', function() {
+$(document).on('click', '#btn-game-test', function() {
     edit.game.game_create();
 });
-$(document).on('click', '#btn-game-stop', function() {
+$(document).on('click', '#btn-game-quit', function() {
     edit.game.game_stop();
+});
+$(document).on('click', '#btn-game-start', function() {
+    edit.game.game_start();
 });
 
 /* viewport shelf */

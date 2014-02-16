@@ -203,9 +203,12 @@ var editor = function(scenario) {
     },
     this.game = {
         init: function() {
-            this.g = null;
+            this.namespace = {
+                g: null
+            }
             this.running = false;
             this.ele = undefined;
+            this.ready = false;
         },
         game_create: function() {
             if (!this.running) {
@@ -217,31 +220,38 @@ var editor = function(scenario) {
                 $('#btn-saveas').prop('disabled', true);
                 $('#btn-save').prop('disabled', true);
                 $('#btn-new').prop('disabled', true);
+                $('#btn-game-test').prop('disabled', true);
+                $('#btn-game-start').prop('disabled', true);
+                $('#btn-game-quit').prop('disabled', false);
                 this.ele = $("<div id='editor-viewport-game'></div>");
                 $('#editor-viewport').css('background-image', 'none');
                 $('#editor-viewport').append(this.ele);
-                this.g = new eng(this.ele, e.file.current_scenario);
+                this.namespace.g = new eng(this.ele, e.file.current_scenario);
                 this.start = new Date().getTime();
-                this.g.initialize(this.game_ready);
+                this.namespace.g.initialize(this.game_ready);
                 this.running = true;
             }
         },
         game_ready: function() {
             if (e.game.running) {
                 var end = new Date().getTime();
-                $('#game-fps').show(100);
-                $('#game-time').show(100);
+                $('#btn-game-start').show(100);
                 $('#lbl-game-status').html('loaded in ' + (end - e.game.start)/1000 + ' seconds');
+                $('#btn-game-start').prop('disabled', false);
+                e.game.ready = true;
             }
         },
         game_stop: function() {
             if (this.running) {
                 e.viewport.reset_view(false);
-                this.g = null;
+                this.namespace.g.stop();
+                delete this.namespace;
+                this.namespace = {};
                 $('#area-game-shelf').hide(250);
                 $('#area-editing-shelf').show(500);
                 $('#game-fps').hide();
                 $('#game-time').hide();
+                $('#game-ms').hide();
                 $('#lbl-game-status').html('loading...');
                 $('#btn-loadjson').prop('disabled', false);
                 $('#btn-savejson').prop('disabled', false);
@@ -249,9 +259,28 @@ var editor = function(scenario) {
                 $('#btn-saveas').prop('disabled', false);
                 $('#btn-save').prop('disabled', false);
                 $('#btn-new').prop('disabled', false);
+                $('#btn-game-test').prop('disabled', false);
+                $('#btn-game-quit').prop('disabled', true);
                 this.running = false;
             }
+        },
+        game_start: function() {
+            if (this.ready) {
+                this.namespace.g.start();
+                $('#btn-game-start').prop('disabled', true);
+                $('#game-fps').show(100);
+                $('#game-time').show(100);
+                $('#game-ms').show(100);
+                this.namespace.g.hook(e.game.game_update);
+            }
+            return this.ready;
+        },
+        game_update: function(delta) {
+            $('#lbl-game-fps').html(parseInt(1000/delta));
+            $('#lbl-game-ms').html(delta);
+            $('#lbl-game-time').html(e.game.namespace.g.stats.time);
         }
+        
     }
 
     this.file.init(scenario);
