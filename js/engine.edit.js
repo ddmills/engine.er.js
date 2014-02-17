@@ -286,16 +286,30 @@ var editor = function(scenario) {
 
     this.layers = {
         init: function() {
-        
+            this.ob = e.file.current_scenario.layers;
+            if (this.ob == undefined)
+                e.file.current_scenario['layers'] = {};
+                this.ob = e.file.current_scenario.layers;
+                
+            console.log(e.file.current_scenario);
+            this.length = Object.keys(this.ob).length;
         },
-        add: function() {
-        
+        add: function(options) {
+            
         },
+        get_order: function() {
+            var order = [];
+            for (key in this.ob) {
+                order[this.ob[key].z] = key;
+            }
+            return order;
+        }
     }
     
     this.file.init(scenario);
     this.game.init();
     this.viewport.init();
+    this.layers.init();
 
 }
 

@@ -9,7 +9,7 @@ $(window).ready(function() {
 });
 
 /* utilities */
-add_alert = function(message, type, id) {
+notify = function(message, type, id) {
     var ele = $("<div class='alert alert-" + type + "'>" + message + "</div>");
     ele.hide();
     $('#' + id + '-notify').append(ele);
@@ -72,12 +72,12 @@ $(document).on('click', '#btn-file-open', function() {
         var selected = id.substr(10, id.length);
         $('#open-modal').modal('hide');
         if (window.edit.file.load_scenario(selected)) {
-            add_alert('file ' + selected + ' loaded successfully' , 'success', 'editor');
+            notify('file ' + selected + ' loaded successfully' , 'success', 'editor');
         } else {
-            add_alert('error opening file', 'danger', 'editor');
+            notify('error opening file', 'danger', 'editor');
         }
     } else {
-        add_alert('no file selected', 'danger', 'open-modal');
+        notify('no file selected', 'danger', 'open-modal');
         console.log('select a file...');
     }
 });
@@ -125,7 +125,7 @@ $(document).on('click', '#btn-game-quit', function() {
 });
 $(document).on('click', '#btn-game-start', function() {
     if (edit.game.game_start())
-        add_alert('game started', 'success', 'editor');
+        notify('game started', 'success', 'editor');
 });
 
 /* viewport shelf */
@@ -135,7 +135,7 @@ $(document).on('click', '#viewport-confirm', function() {
     var c = $('#viewport-bkg-color').val();
     edit.viewport.set_size(w, h);
     edit.viewport.set_background(c);
-    add_alert('viewport updated', 'success', 'viewport');
+    notify('viewport updated', 'success', 'viewport');
 });
 $(document).on('click', '#viewport-cancel', function() {
     $('#viewport-width').val(edit.viewport.ob.width);
@@ -145,5 +145,23 @@ $(document).on('click', '#viewport-cancel', function() {
 
 /* layers shelf */
 $(document).on('click', '#view-layer-add', function() {
-    
+    $('#shelf-layer-view').hide(200);
+    layer_add_form_clear();
+    $('#shelf-layer-add').show(200);
 });
+/* layers : add */
+layer_add_form_clear = function() {
+    $('#layer-add-form-name').val('layer_' + edit.layers.length);
+    
+    
+    
+    $('#layer-add-form-width').val(edit.viewport.ob.width);
+    $('#layer-add-form-height').val(edit.viewport.ob.height);
+    $('#layer-add-form-left').val('0');
+    $('#layer-add-form-top').val('0');
+    $('span', $('#uniform-layer-add-form-overlay')).removeClass('checked');
+    $('span', $('#uniform-layer-add-form-persistant')).removeClass('checked');
+    $('#layer-add-form-overlay').removeAttr('checked');
+    $('#layer-add-form-persistant').removeAttr('checked');
+    $('#layer-add-err').html('');
+}

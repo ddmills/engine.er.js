@@ -141,11 +141,10 @@
                         <li class='navtab' id='goto-components' title='components'><a><span class='glyphicon glyphicon-tree-deciduous'></span> </a></li>
                     </ul>
                     <div id='shelf-layers' class='shelf-main'>
-                        <div id='shelf-layer-view'>
+                        <div id='shelf-layer-view' class='view-default'>
                             <h3><span class='glyphicon glyphicon-file'></span> layers </h3>
                             <hr>
                             <div id='layer-view-notify' class='alert-area'></div>
-                            <div id='layer-view-err' class='alert-area'></div>
                             
                             <div class='well big-list' id='layer-list'></div>
                             <button type='button' class='btn btn-default' id='view-layer-add'>
@@ -157,36 +156,61 @@
                             <span id='btn-layer-add-back' title='back to layers' class='btn-back glyphicon glyphicon-circle-arrow-left'></span>
                             <span class='glyphicon glyphicon-file'></span> new layer </h3>
                             <hr>
-                            <div id='layer-add-err' class='alert-area'></div>
+                            <div id='layer-add-notify' class='alert-area'></div>
                             <div class='form-group well'>
+                            
+                                
+                            
                                 <label for='layer-add-form-name'>name</label>
-                                <input type='text' class='form-control' id='layer-add-form-name' value='name'>
+                                <input type='text' title='choose unique name' class='form-control' id='layer-add-form-name' value='name'>
                                 
-                                <label for='layer-add-form-width'>width</label>
-                                <input type='text' class='form-control pos-int-only' id='layer-add-form-width' value='500'>
                                 
-                                <label for='layer-add-form-height'>height</label>
-                                <input type='text' class='form-control pos-int-only' id='layer-add-form-height' value='300'>
                                 
-                                <label for='layer-add-form-left'>left</label>
-                                <input type='text' class='form-control int-only' id='layer-add-form-left' value='0'>
-                                
-                                <label for='layer-add-form-top'>top</label>
-                                <input type='text' class='form-control int-only' id='layer-add-form-top' value='0'>
-                                
-                                <div class='checkbox'>
-                                    <label>
-                                        <input type='checkbox' id='layer-add-form-overlay'>overlay
-                                        <p class='help-block'>layer is full size</p>
-                                    </label>
+                                <label> size </label>
+                                <div class='well form-group-sub'>
+                                    <div class='checkbox' title='layer will be the same size as the viewport'>
+                                        <label>
+                                            <input type='checkbox' id='layer-add-form-full'>full size
+                                        </label>
+                                    </div>
+                                    
+                                    <div class='form-inline'>
+                                        <label for='layer-add-form-width'>width</label>
+                                        <input type='text' title='width of layer, in pixels' class='form-control pos-int-only' id='layer-add-form-width' value='500'>
+                                    </div>
+                                    
+                                    <div class='form-inline'>
+                                        <label for='layer-add-form-height'>height</label>
+                                        <input type='text' title='height of layer, in pixels' class='form-control pos-int-only' id='layer-add-form-height' value='300'>
+                                    </div>
+                                    
+                                    <div class='form-inline'>
+                                        <label for='layer-add-form-left'>left</label>
+                                        <input type='text' title='distance between left edge of viewport and left edge of layer, in pixels' class='form-control int-only' id='layer-add-form-left' value='0'>
+                                    </div>
+                                    
+                                    <div class='form-inline'>
+                                        <label for='layer-add-form-top'>top</label>
+                                        <input type='text' title='distance between top edge of viewport and top edge of layer, in pixels' class='form-control int-only' id='layer-add-form-top' value='0'>
+                                    </div>
+                                </div>
+                                <label> refresh </label>
+                                <div class='well form-group-sub'>
+                                    <div class='checkbox' title='layer will be continually refreshed, ideal for sprites'>
+                                        <label>
+                                            <input type='checkbox' id='layer-add-form-refresh'>refresh
+                                        </label>
+                                    </div>
+                                    <div class='form-inline'>
+                                        <label for='layer-add-form-width'>refresh rate</label>
+                                        <input type='text' title='number of frames between refreshes' class='form-control pos-int-only' id='layer-add-form-width' value='1'>
+                                    </div>
                                 </div>
                                 
-                                <div class='checkbox'>
-                                    <label>
-                                        <input type='checkbox' id='layer-add-form-persistant'>refreshed
-                                        <p class='help-block'>layer is cleared whenever it's dirty</p>
-                                    </label>
-                                </div>
+                                
+                                
+                                
+                                
                                 
                                 <button type='button' class='btn btn-default' id='add-layer-cancel'>
                                     <span class='glyphicon glyphicon-remove'></span> cancel
@@ -241,7 +265,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id='shelf-viewport' class='shelf-main'>
+                    <div id='shelf-viewport' class='shelf-main' class='view-default'>
                         <h3><span class='glyphicon glyphicon-camera'></span> viewport </h3>
                         <hr>
                         <div id='viewport-notify' class='alert-area'></div>
@@ -260,12 +284,12 @@
                             </button>
                         </div>
                     </div>
-                    <div id='shelf-entities' class='shelf-main'>
+                    <div id='shelf-entities' class='shelf-main' class='view-default'>
                         <h3><span class='glyphicon glyphicon-heart'></span> entities </h3>
                         <hr>
                     </div>
                     <div id='shelf-settings' class='shelf-main'>
-                        <div id='shelf-settings-all'>
+                        <div id='shelf-settings-all' class='view-default'>
                             <div id='settings-all-notify' class='alert-area'></div>
                             <h3><span class='glyphicon glyphicon-wrench'></span> settings </h3>
                             <hr>
@@ -299,7 +323,7 @@
                         </div>
                     </div>
                     <div id='shelf-resources' class='shelf-main'>
-                        <div id='shelf-resources-all'>
+                        <div id='shelf-resources-all' class='view-default'>
                             <div id='resources-all-notify' class='alert-area'></div>
                             <h3><span class='glyphicon glyphicon-leaf'></span> resources </h3>
                             <hr>
@@ -349,7 +373,7 @@
                         </div>
                     </div>
                     <div id='shelf-components' class='shelf-main'>
-                        <div id='shelf-components-all'>
+                        <div id='shelf-components-all' class='view-default'>
                             <div id='components-all-notify' class='alert-area'></div>
                             <h3><span class='glyphicon glyphicon-tree-deciduous'></span> components </h3>
                             <hr>

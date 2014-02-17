@@ -309,10 +309,25 @@ h4 {
     margin-top: 8px;
 }
 .form-group-sub {
+    position: relative;
     padding-top: 4px;
     background-color: #E7E7E7;
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
+    margin-top: 2px;
+    margin-bottom: 8px;
+}
+label {
+    margin-top: 4px;
+    margin-bottom: 0px;
+}
+.form-inline>input {
+    position: absolute;
+    right: 0px;
+    margin: 0px;
+    width: 50% !important;
+}
+.form-inline {
+    position: relative;
+    padding: 8px;
 }
 .alert-area {
     width: 80%;
