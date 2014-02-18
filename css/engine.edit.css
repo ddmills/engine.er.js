@@ -137,7 +137,7 @@ body {
     max-height: 200px;
     margin-bottom: 4px;
     margin-top: 2px;
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hide;
     padding: 4px;
 }
@@ -202,14 +202,14 @@ body {
     height : 100%;
     width : 100%;
     padding-top: 5px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 #area-game-shelf {
     position: absolute;
     height : 100%;
     width : 100%;
     padding-top: 5px;
-    overflow-y: scroll;
+    overflow-y: auto;
     display: none;
 }
 .shelf-main {
@@ -310,7 +310,10 @@ h4 {
 }
 .form-group-sub {
     position: relative;
-    padding-top: 4px;
+    padding-top: 2px;
+    padding-bottom: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
     background-color: #E7E7E7;
     margin-top: 2px;
     margin-bottom: 8px;
@@ -325,15 +328,31 @@ label {
     margin: 0px;
     width: 50% !important;
 }
+.form-inline>select {
+    position: absolute;
+    right: 0px;
+    margin: 0px;
+    width: 50% !important;
+}
 .form-inline {
     position: relative;
-    padding: 8px;
+    padding: 4px;
+    margin: 8px;
 }
 .alert-area {
-    width: 80%;
     max-width: 512px;
     margin-left: auto;
     margin-right: auto;
     margin-top: 4px;
     margin-bottom: 4px;
 }
+
+
+
+
+
+
+
+
+
+

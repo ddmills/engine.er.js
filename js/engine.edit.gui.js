@@ -13,7 +13,7 @@ notify = function(message, type, id) {
     var ele = $("<div class='alert alert-" + type + "'>" + message + "</div>");
     ele.hide();
     $('#' + id + '-notify').append(ele);
-    ele.show(500);
+    ele.slideDown(200);
     setTimeout(function() {
         ele.slideUp(200);
     }, 4000);
@@ -96,7 +96,8 @@ $(document).on('click', '.list-file-item', function() {
 });
 $(document).on('click', '#btn-save', function() {
     if (edit.file.current_scenario != 'untitled') {
-        window.edit.file.save_scenario();
+        if (edit.file.save_scenario())
+            notify('game saved to localStorage', 'success', 'editor');
     } else {
         var name = $('#saveas-file-name').val();
         $('#saveas-modal').modal('show');
@@ -104,7 +105,10 @@ $(document).on('click', '#btn-save', function() {
 });
 $(document).on('click', '#btn-file-saveas', function() {
     var name = $('#saveas-file-name').val();
-    edit.file.save_scenario(name);
+    if (edit.file.save_scenario(name)) {
+        $('#saveas-modal').modal('hide');
+        notify('file saved to localStorage', 'success', 'editor');
+    }
 });
 $(document).on('click', '#file-json-load', function() {
     console.log('wait ' + $('#area-left').css('width'));
@@ -149,19 +153,131 @@ $(document).on('click', '#view-layer-add', function() {
     layer_add_form_clear();
     $('#shelf-layer-add').show(200);
 });
+/* layers : view */
+$(document).on('click', '#layer-list > .big-list-item', function() {
+    var name = $(this).children('p').html();
+    edit.layers.select(name);
+});
+$(document).on('click', '.btn-layer-vis', function() {
+    var id = $(this).attr('id');
+    var name = id.substr(14, id.length);
+    var lay = edit.layers.layers[name];
+    if (lay.visible) {
+        var html = "<span class='glyphicon glyphicon-eye-close'></span>";
+        lay.set_visibility(false);
+    } else {
+        var html = "<span class='glyphicon glyphicon-eye-open'></span>";
+        lay.set_visibility(true);
+    }
+    $(this).html(html);
+});
+$(document).on('click', '.btn-layer-up', function() {
+    var id = $(this).attr('id');
+    var name = id.substr(13, id.length);
+    edit.layers.move_up(name);
+});
+$(document).on('click', '.btn-layer-down', function() {
+    var id = $(this).attr('id');
+    var name = id.substr(15, id.length);
+    edit.layers.move_down(name);
+});
+$(document).on('click', '.btn-layer-delete', function() {
+    var id = $(this).attr('id');
+    var name = id.substr(17, id.length);
+    var r = confirm('Are you sure you want to delete layer: ' + name + '?');
+    if (r) {
+        edit.layers.remove_layer(name);
+    }
+});
 /* layers : add */
 layer_add_form_clear = function() {
     $('#layer-add-form-name').val('layer_' + edit.layers.length);
+
+    /* checkboxes */
+    $('#layer-add-form-fullsize').removeAttr('checked');
+    $('#layer-add-form-refresh').removeAttr('checked');
+    $('#layer-add-form-locked').removeAttr('checked');
+    $('#layer-add-form-fillsprite').removeAttr('checked');
     
+    /* refresh */
+    $('#layer-add-form-refreshrate').val('1');
+    $('#layer-add-form-group-refresh').hide();
     
-    
+    /* size */
+    $('#layer-add-form-group-fullsize').show();
     $('#layer-add-form-width').val(edit.viewport.ob.width);
     $('#layer-add-form-height').val(edit.viewport.ob.height);
     $('#layer-add-form-left').val('0');
     $('#layer-add-form-top').val('0');
-    $('span', $('#uniform-layer-add-form-overlay')).removeClass('checked');
-    $('span', $('#uniform-layer-add-form-persistant')).removeClass('checked');
-    $('#layer-add-form-overlay').removeAttr('checked');
-    $('#layer-add-form-persistant').removeAttr('checked');
-    $('#layer-add-err').html('');
+    
+    /* fill */
+    $('#layer-add-form-group-fillsprite').hide();
+    $('#layer-add-form-fillsprite-sprite').html('');
+    for (sprite in edit.resources.sprites) {
+        var ele = $('<option value="' + sprite + '">' + sprite + '</option>');
+        $('#layer-add-form-fillsprite-sprite').append(ele);
+    }
+    
+    $('#layer-add-notify').html('');
 }
+$(document).on('change', '#layer-add-form-refresh', function() {
+    if (this.checked)
+        $('#layer-add-form-group-refresh').show(100);
+    else
+        $('#layer-add-form-group-refresh').hide(100);
+});
+$(document).on('change', '#layer-add-form-fullsize', function() {
+    if (this.checked)
+        $('#layer-add-form-group-fullsize').hide(100);
+    else
+        $('#layer-add-form-group-fullsize').show(100);
+});
+$(document).on('change', '#layer-add-form-fillsprite', function() {
+    if (this.checked)
+        $('#layer-add-form-group-fillsprite').show(100);
+    else
+        $('#layer-add-form-group-fillsprite').hide(100);
+});
+$(document).on('click', '#add-layer-confirm', function() {
+    var name = $('#layer-add-form-name').val();
+    var opts = {};
+    opts.fullsize = $('#layer-add-form-fullsize').is(':checked');
+    opts.refresh = $('#layer-add-form-refresh').is(':checked');
+    opts.locked = $('#layer-add-form-locked').is(':checked');
+    opts.fillsprite = $('#layer-add-form-fillsprite').is(':checked');
+    
+    if (opts.fillsprite)
+        opts.fillsprite_name = $('#layer-add-form-fillsprite-sprite').val();
+    
+    if (opts.refresh)
+        opts.refresh_rate = $('#layer-add-form-refreshrate').val();
+        
+    if (!opts.fullsize) {
+        opts.width = $('#layer-add-form-width').val();
+        opts.height =$('#layer-add-form-height').val();
+        opts.left = $('#layer-add-form-left').val();
+        opts.top = $('#layer-add-form-top').val();
+    }
+    
+    opts.z = edit.layers.length;
+    
+    var result = edit.layers.add(name, opts);
+    if (result.added) {
+        $('#shelf-layer-add').hide(200);
+        $('#shelf-layer-view').show(200, function() {
+            notify('layer "' + name + '" added', 'success', 'layer-view');
+        });
+        
+    } else {
+        notify(result.error, 'danger', 'layer-add');
+    }
+});
+$(document).on('click', '#btn-layer-add-back', function() {
+   $('#shelf-layer-add').hide(200);
+   $('#shelf-layer-view').show(200);
+});
+$(document).on('click', '#add-layer-cancel', function() {
+   $('#shelf-layer-add').hide(200);
+   $('#shelf-layer-view').show(200);
+});
+

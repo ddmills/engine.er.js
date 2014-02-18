@@ -1,7 +1,7 @@
 
 var eng = function(id, scenario) {
     var g = this;
-    
+    var g_div = $('#' + id);
     this.running = false;
     this.paused = false;
     this.hooks = [];
@@ -20,8 +20,13 @@ var eng = function(id, scenario) {
             this.width = 640;
             this.height = 480;
             this.background = null;
-            for (k in ob)
-                this.k = ob.k;
+            for (k in ob) {
+                this[k] = ob[k];
+            }
+            
+            g_div.css('background', 'blue');
+            g_div.css('width', this.width);
+            g_div.css('height', this.height);
             this.__ready = true;
             callback();
         },

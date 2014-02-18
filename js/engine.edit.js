@@ -1,3 +1,28 @@
+if (!Array.prototype.filter) {
+    Array.prototype.filter = function(fun /*, thisp */) {   
+        "use strict";
+
+        if (this === void 0 || this === null)
+            throw new TypeError();
+
+        var t = Object(this);
+        var len = t.length >>> 0;
+        if (typeof fun !== "function")
+            throw new TypeError();
+
+        var res = [];
+        var thisp = arguments[1];
+        for (var i = 0; i < len; i++) {
+            if (i in t) {
+                var val = t[i]; // in case fun mutates this
+                if (fun.call(thisp, val, i, t))
+                res.push(val);
+            }
+        }
+
+        return res;
+    };
+}
 var editor = function(scenario) {
     var e = this;
     
@@ -70,6 +95,7 @@ var editor = function(scenario) {
                     this.new_scenario('untitled');
                 }
             }
+            e.init();
         },
         /* used when you hit 'new scenario' button */
         default_scenario : {
@@ -92,7 +118,7 @@ var editor = function(scenario) {
                 this.clear_scenario();
                 this.current_scenario = scen;
                 this.current_file = name;
-                e.viewport.init();
+                e.init();
                 this.storage.setItem('__editor___previous', name);
                 $('#header-filename').html(name);
                 return true;
@@ -117,7 +143,7 @@ var editor = function(scenario) {
             this.current_file = 'untitled';
             $('#header-filename').html(this.current_file);
             this.current_scenario = this.default_scenario;
-            e.viewport.init();
+            e.init();
         },
         /* saves a scenario with a given name */
         save_scenario : function(name) {
@@ -127,6 +153,7 @@ var editor = function(scenario) {
             this.storage.setItem('__scenarios_' + name, this.get_json(this.current_scenario));
             this.storage.setItem('__editor___previous', name);
             $('#header-filename').html(this.current_file);
+            return true;
         },
         /* removes the current scenario */
         clear_scenario: function() {
@@ -167,6 +194,7 @@ var editor = function(scenario) {
             this.ob.height = height;
             this.reset_view();
             e.resize();
+            e.layers.viewport_resized();
         },
         set_background: function(background) {
             this.ob.background = background;
@@ -227,9 +255,10 @@ var editor = function(scenario) {
                 this.ele = $("<div id='editor-viewport-game'></div>");
                 $('#editor-viewport').css('background-image', 'none');
                 $('#editor-viewport').append(this.ele);
-                this.namespace.g = new eng(this.ele, e.file.current_scenario);
+                this.namespace.g = new eng('editor-viewport-game', e.file.current_scenario);
                 this.start = new Date().getTime();
                 this.namespace.g.initialize(this.game_ready);
+                e.layers.game_start();
                 this.running = true;
             }
         },
@@ -248,6 +277,7 @@ var editor = function(scenario) {
                 this.namespace.g.stop();
                 delete this.namespace;
                 this.namespace = {};
+                this.ele.remove();
                 $('#area-game-shelf').hide(250);
                 $('#area-editing-shelf').show(500);
                 $('#game-fps').hide();
@@ -262,6 +292,7 @@ var editor = function(scenario) {
                 $('#btn-new').prop('disabled', false);
                 $('#btn-game-test').prop('disabled', false);
                 $('#btn-game-quit').prop('disabled', true);
+                e.layers.game_stop();
                 this.running = false;
             }
         },
@@ -284,32 +315,271 @@ var editor = function(scenario) {
         
     }
 
+    this.resources = {
+        init: function() {
+            this.sprites = {
+                'herp': 'test',
+                'derp': 'oogly',
+                'gurp': 'boogly',
+                'murp': 'pugly'
+            }
+        },
+    
+    }
+    
+    this.wrapper_layer = function(name, opts) {
+        e.file.current_scenario.layers[name] = opts;
+        this.ob = e.file.current_scenario.layers[name];
+        this.name = name;
+        this.visible = true;
+        this.ele_container_div = $("<div class='editor-layer-container' id='editor-layer-container-"+this.name+"'></div>");
+        this.ele_content_div = $("<div class='editor-layer-contents' id='layer-contents-'"+this.name+"'></div>");
+        this.ele_text_div = $("<p class='editor-layer-text'>" + this.name + "</p>");
+        this.ele_list_div = $("<div class='big-list-item layer-item' id='layer-view-" + name + "'>" +
+            "<p class='big-list-item-title' id='title-layer-edit-" + name +  "'>" + name + "</p>" +
+            "<div class='btn-group big-list-item-controls'>" +
+                "<button title='show or hide' type='button' class='btn btn-default btn-xs btn-layer-vis' id='btn-layer-vis-"+ name +"'><span class='glyphicon glyphicon-eye-open'></span></button>" +
+                "<button title='edit properties' type='button' class='btn btn-default btn-xs btn-layer-edit' id='btn-layer-edit-"+ name +"'><span class='glyphicon glyphicon-pencil'></span></button>" +
+                "<button title='delete' type='button' class='btn btn-default btn-xs btn-layer-delete' id='btn-layer-delete-"+ name +"'><span class='glyphicon glyphicon-trash'></span></button>" +
+                "<button title='move up' type='button' class='btn btn-default btn-xs btn-layer-up' id='btn-layer-up-"+ name +"'><span class='glyphicon glyphicon-chevron-up'></span></button>" +
+                "<button title='move down' type='button' class='btn btn-default btn-xs btn-layer-down' id='btn-layer-down-"+ name +"'><span class='glyphicon glyphicon-chevron-down'></span></button>" +
+            "</div>" +
+        "</div>");
+        this.canvas = $("<canvas class='editor-canvas' id='editor-canvas-" + this.name + "'>");
+        this.context = this.canvas[0].getContext('2d');
+        
+        this.ele_content_div.append(this.canvas);
+        this.ele_container_div.append(this.ele_content_div);
+        this.ele_container_div.append(this.ele_text_div);
+        
+        $('#editor-viewport').append(this.ele_container_div);
+        $('#layer-list').append(this.ele_list_div);
+        this.set_z(opts.z);
+        this.update_view();
+    }
+    this.wrapper_layer.prototype.set_visibility = function(visibility) {
+        this.visible = visibility;
+        if (this.visible) {
+            this.ele_content_div.fadeTo(200, 1);
+            this.ele_text_div.fadeTo(200, 1);
+            this.ele_container_div.addClass('editor-layer-container-visible');
+            this.ele_container_div.removeClass('editor-layer-container-hidden');
+        } else {
+            this.ele_content_div.fadeTo(200, 0);
+            this.ele_text_div.fadeTo(200, .15);
+            this.ele_container_div.removeClass('editor-layer-container-visible');
+            this.ele_container_div.addClass('editor-layer-container-hidden');
+        }
+    }
+    this.wrapper_layer.prototype.update_view = function() {
+        var d = this.get_dimensions();
+
+        this.canvas.attr('width', d.width);
+        this.canvas.attr('height', d.height);
+    
+        this.ele_content_div.css('height', d.height + 'px');
+        this.ele_content_div.css('width', d.width + 'px');
+        
+        this.ele_container_div.css('left', d.left + 'px');
+        this.ele_container_div.css('top', d.top + 'px');
+        
+        this.set_visibility(this.visible);
+    }
+    this.wrapper_layer.prototype.get_dimensions = function() {
+        var d = {}
+        if (this.ob.fullsize) {
+            d.width = e.viewport.ob.width;
+            d.height = e.viewport.ob.height;
+            d.left = 0;
+            d.top = 0;
+        } else {
+            d.width = this.ob.width;
+            d.height = this.ob.height;
+            d.left = this.ob.left;
+            d.top = this.ob.top;
+        }
+        return d;
+    }
+    this.wrapper_layer.prototype.hide = function() {
+        this.ele_container_div.remove();
+        this.ele_list_div.remove();
+    },
+    this.wrapper_layer.prototype.show = function(time) {
+        if (time) {
+            this.ele_content_div.css('opacity', '0');
+            this.ele_text_div.css('opacity', '0');
+            $('#editor-viewport').append(this.ele_container_div);
+            $('#layer-list').append(this.ele_list_div);
+            this.ele_content_div.fadeTo(time, 1);
+            this.ele_text_div.fadeTo(time, 1);
+            return true;
+        }
+        $('#editor-viewport').append(this.ele_container_div);
+        $('#layer-list').append(this.ele_list_div);
+        return true;
+    }
+    this.wrapper_layer.prototype.set_z = function(order) {
+        console.log('changing z: ' + order);
+        this.order = order;
+        this.ob['z'] = order;
+        this.z_order = 100 - this.order;
+        this.ele_container_div.css('z-index', this.z_order);
+    }
+    this.wrapper_layer.prototype.update_list_view = function() {
+        $('#layer-list').append(this.ele_list_div);
+    }
+    this.wrapper_layer.prototype.resize = function(size) {
+        if (!this.ob.fullsize) {
+            this.ob.width = size.width;
+            this.ob.height = size.height;
+        }
+        this.update_view();
+    }
+    this.wrapper_layer.prototype.set_name = function(new_name) {
+        $('#title-layer-edit-' + this.name).html(new_name);
+        this.ele_text_div.html(new_name);
+        this.ele_container_div.attr('id', 'editor-layer-container-' + new_name);
+        this.ele_content_div.attr('id', 'editor-layer-contents-' + new_name);
+        $('#layer-view-' + this.name).attr('id', 'layer-view-' + new_name);
+        $('#title-layer-edit-' + this.name).attr('id', 'title-layer-edit-' + new_name);
+        $('#btn-layer-edit-' + this.name).attr('id', 'btn-layer-edit-' + new_name);
+        $('#btn-layer-up-' + this.name).attr('id', 'btn-layer-up-' + new_name);
+        $('#btn-layer-down-' + this.name).attr('id', 'btn-layer-down-' + new_name);
+        $('#btn-layer-vis-' + this.name).attr('id', 'btn-layer-vis-' + new_name);
+        this.name = new_name;
+    }
+    this.wrapper_layer.prototype.remove = function() {
+        this.ele_container_div.remove();
+        this.ele_list_div.remove();
+        delete e.file.current_scenario.layers[this.name];
+        delete this;
+    }
+    
     this.layers = {
         init: function() {
             this.ob = e.file.current_scenario.layers;
-            if (this.ob == undefined)
+            this.layers = {};
+            this.selected_layer = '';
+            if (this.ob == undefined) {
                 e.file.current_scenario['layers'] = {};
                 this.ob = e.file.current_scenario.layers;
-                
-            console.log(e.file.current_scenario);
-            this.length = Object.keys(this.ob).length;
-        },
-        add: function(options) {
+            }
             
+            this.length = 0;
+            
+            $('#layer-list').html('');
+            
+            for (layer in this.ob)
+                this.add(layer, this.ob[layer]);
+            
+            
+
+        },
+        add: function(name, options) {
+            if (!options.z)
+                options.z = this.length;
+            if (this.layers[name] == undefined) {
+                this.layers[name] = new e.wrapper_layer(name, options);
+                this.length++;
+                return {'added': true};
+            }
+            return {'added': false, 'error': 'layer name "' + name + '" is already taken'};
+        },
+        select: function(name) {
+            $('#layer-list > .big-list-item-selected').removeClass('big-list-item-selected');
+            $('.editor-layer-container-selected').removeClass('editor-layer-container-selected');
+            $('.editor-layer-text-selected').removeClass('editor-layer-text-selected');
+            $('#editor-layer-container-' + name).addClass('editor-layer-container-selected');
+            $('#layer-view-' + name).addClass('big-list-item-selected');
+            layer = this.layers[name].ele_text_div.addClass('editor-layer-text-selected');
+            this.selected_layer = layer;
         },
         get_order: function() {
             var order = [];
-            for (key in this.ob) {
+            for (key in this.ob)
                 order[this.ob[key].z] = key;
-            }
             return order;
+        },
+        viewport_resized: function() {
+            /* update in case the layers are fullsize */
+            for (layer in this.layers)
+                this.layers[layer].update_view();
+        },
+        move_up: function(name) {
+            var lay = this.layers[name];
+            if (lay.order == 0) {
+                return false
+            } else {
+                var above = this.get_layer_at_z(lay.order - 1);
+                above.set_z(lay.order);
+                lay.set_z(lay.order-1);
+                lay.ele_list_div.slideUp(100, function() {
+                    lay.ele_list_div.before(above.ele_list_div);
+                    lay.ele_list_div.after(above.ele_list_div);
+                    lay.ele_list_div.slideDown(100);
+                });
+            }
+        },
+        move_down: function(name) {
+            var lay = this.layers[name];
+            if ((lay.order + 1) == this.length) {
+                return false
+            } else {
+                var below = this.get_layer_at_z(lay.order + 1);
+                below.set_z(lay.order);
+                lay.set_z(lay.order+1);
+                lay.ele_list_div.slideUp(100, function() {
+                    lay.ele_list_div.after(below.ele_list_div);
+                    lay.ele_list_div.before(below.ele_list_div);
+                    lay.ele_list_div.slideDown(100);
+                });
+            }
+        },
+        get_layer_at_z: function(z) {
+            for (layer in this.layers) {
+                if (this.layers[layer].order == z)
+                    return this.layers[layer];
+            }
+        },
+        remove_layer: function(name) {
+            var lay = this.layers[name];
+            var z = lay.ob.z;
+            lay.remove();
+            delete this.layers[name];
+            for (var i = z; i < this.length-1; i++)
+                this.get_layer_at_z(i+1).set_z(i);
+            this.length--;
+        },
+        update_list_view: function() {
+            $('#layer-list').html('');
+            for (layer in this.layers)
+                this.layers[layer].update_list_view();
+        },
+        game_start: function() {
+            this.hide_all();
+        },
+        game_stop: function() {
+            this.show_all();
+        },
+        hide_all: function() {
+            for (layer in this.layers)
+                this.layers[layer].hide();
+        },
+        show_all: function() {
+            for (layer in this.layers)
+                this.layers[layer].show(500);
         }
     }
     
+    this.init = function() {
+        this.game.init();
+        this.viewport.init();
+        this.resources.init();
+        this.layers.init();
+    }
+    
     this.file.init(scenario);
-    this.game.init();
-    this.viewport.init();
-    this.layers.init();
+    
 
 }
 
