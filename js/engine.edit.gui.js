@@ -409,6 +409,20 @@ $(document).on('click', '#btn-resources-images', function() {
     $('#shelf-resources-all').hide(200);
     $('#shelf-resources-images').show(200);
 });
+
+/* resources: images*/
+draw_thumb = function(name) {
+    var imgob = edit.resources.images[name];
+    if (imgob != undefined) {
+        var img = imgob.img;
+        var thumb_can = $('#image-thumb');
+        var ctx = thumb_can[0].getContext('2d');
+        var w = parseInt(thumb_can.css('width'));
+        var h = parseInt(thumb_can.css('height'));
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0);
+    }
+}
 $(document).on('click', '#btn-resources-images-back', function() {
     $('#shelf-resources-images').hide(200);
     $('#shelf-resources-all').show(200);
@@ -416,22 +430,20 @@ $(document).on('click', '#btn-resources-images-back', function() {
 $(document).on('click', '#image-add-confirm', function() {
     var source = $('#image-add-path').val()
     var name = $('#image-add-name').val()
-    
-    if (edit.resources.images[name] != null) {
-        notify('there is already an image named "' + name + '"', 'danger', 'resources-images');
-    } else {
-        edit.resources.add_img(name, source, function(success) {
-            if (success) {
-                notify('image "'+ name +'" added', 'success', 'resources-images');
-            } else {
-                notify('image at "' + source + '" could not be loaded', 'danger', 'resources-images');
-            }
-        });
-    }
+    edit.resources.add_img(name, {source: source}, function(success, err) {
+        if (success) {
+            notify('image "'+ name +'" added', 'success', 'resources-images');
+            draw_thumb(name);
+        } else {
+            notify(err, 'danger', 'resources-images');
+        }
+    });
 });
-
-
-
-
+$(document).on('click', '#res-images-list > .big-list-item', function() {
+    var name = $(this).children('p').html();
+    $('#res-images-list > .big-list-item-selected').removeClass('big-list-item-selected');
+    $(this).addClass('big-list-item-selected');
+    draw_thumb(name);
+});
 
 

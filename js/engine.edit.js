@@ -1,28 +1,3 @@
-if (!Array.prototype.filter) {
-    Array.prototype.filter = function(fun /*, thisp */) {   
-        "use strict";
-
-        if (this === void 0 || this === null)
-            throw new TypeError();
-
-        var t = Object(this);
-        var len = t.length >>> 0;
-        if (typeof fun !== "function")
-            throw new TypeError();
-
-        var res = [];
-        var thisp = arguments[1];
-        for (var i = 0; i < len; i++) {
-            if (i in t) {
-                var val = t[i]; // in case fun mutates this
-                if (fun.call(thisp, val, i, t))
-                res.push(val);
-            }
-        }
-
-        return res;
-    };
-}
 var editor = function(scenario) {
     var e = this;
     
@@ -94,7 +69,6 @@ var editor = function(scenario) {
                     this.new_scenario('untitled');
                 }
             }
-            e.init();
         },
         /* used when you hit 'new scenario' button */
         default_scenario : {
@@ -321,8 +295,22 @@ var editor = function(scenario) {
         this.time = new Date().getTime();
         this.img = new Image();
         var me = this;
-        this.img.onload = function() { callback(true); }
-        this.img.onerror = function() { callback(false); }
+        this.img.onload = function() { 
+            e.resources.ob.images[name] = me.ob;
+            var opt = $("<div class='big-list-item' id='res-image-item-" + me.name + "'>" +
+                "<p class='big-list-item-title' id='title-res-image-" + me.name +  "'>" + me.name + "</p>" +
+                "<div class='btn-group big-list-item-controls'>" +
+                "<button title='delete' class='btn btn-default btn-xs btn-img-delete' id='btn-image-delete-" + me.name + "'><span class='glyphicon glyphicon-trash'></span></button>" +
+                "<button title='refresh' class='btn btn-default btn-xs btn-img-refresh' id='btn-image-refresh-" + me.name + "'><span class='glyphicon glyphicon-refresh'></span></button>" +
+                "</div></div>");
+                
+            $('#res-images-list').append(opt);
+            $('#images-thumbs').show(500);
+
+            
+            callback ? callback(true) : null; 
+        }
+        this.img.onerror = function() { callback ? callback(false) : null; }
         this.img.src = this.source + '?time=' + this.time;
         this.users = {};
     }
@@ -330,36 +318,53 @@ var editor = function(scenario) {
         this.time = new Date().getTime();
         this.img.src = this.source + '?time=' + this.time;
     }
+    this.wrapper_image.prototype.remove = function() {
+        $('#res-image-item-' + this.name).remove();
+        for (var user in this.users) {
+            users[user].notify_img_remove(this);
+        }
+        delete e.resources.images[this.name];
+        delete this;
+    }
     
     this.resources = {
         init: function() {
+            this.ob = e.file.current_scenario.resources;
+            if (this.ob == undefined) {
+                e.file.current_scenario['resources'] = {
+                    images: {},
+                    sprites: {}
+                }
+                this.ob = e.file.current_scenario.layers;
+            }
             this.sprites = {
                 'herp': 'test',
                 'derp': 'oogly',
                 'gurp': 'boogly',
                 'murp': 'pugly'
             }
-            e.file.current_scenario['resources'] = {
-                images: {},
-                sprites: {}
-            }
             this.images = {};
+            for (var key in this.ob.images)
+                console.log(this.ob.images);
+            
+            this.add_img(key, this.ob.images[key]);
+
         },
-        add_img: function(name, source, callback) {
-            e.file.current_scenario.resources.images[name] = {source: source};
-            var ob = e.file.current_scenario.resources.images[name];
-            var img = new e.wrapper_image(name, ob, function(success) {
-                if (success) {
-                    e.resources.images[name] = img;
-                } else {
-                    
-                }
-                callback(success);
-            });
+        add_img: function(name, options, callback) {
+            if (this.images[name] == undefined) {
+                var img = new e.wrapper_image(name, options, function(success) {
+                    if (success) {
+                        e.resources.images[name] = img;
+                        callback ? callback(true, 'image added successfully') : null;
+                    } else {
+                        callback ? callback(false, 'image at "' + options.source + '" could not be loaded') : null;
+                    }
+                });
+            } else {
+                callback ? callback(false, 'layer name "' + name + '" is already taken') : null;
+            }
         }
     }
-    
-    
 
     this.wrapper_layer = function(name, opts) {
         e.file.current_scenario.layers[name] = opts;
@@ -588,9 +593,6 @@ var editor = function(scenario) {
             
             for (layer in this.ob)
                 this.add(layer, this.ob[layer]);
-            
-            
-
         },
         add: function(name, options) {
             if (!options.z)
