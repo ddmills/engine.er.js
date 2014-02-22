@@ -346,6 +346,10 @@ layer_edit_form_set = function(name) {
     $('#layer-edit-notify').html('');
     
 }
+$(document).on('click', '#btn-layer-edit-back', function() {
+    $('#shelf-layer-edit').hide(200);
+    $('#shelf-layer-view').show(200);
+});
 $(document).on('change', '#layer-edit-form-refresh', function() {
     if (this.checked)
         $('#layer-edit-form-group-refresh').show(100);
@@ -409,9 +413,13 @@ $(document).on('click', '#btn-resources-images', function() {
     $('#shelf-resources-all').hide(200);
     $('#shelf-resources-images').show(200);
 });
+$(document).on('click', '#btn-resources-sprites', function() {
+    $('#shelf-resources-all').hide(200);
+    $('#shelf-resources-sprites').show(200);
+});
 
-/* resources: images*/
-draw_thumb = function(name) {
+/* resources: images */
+draw_img_thumb = function(name) {
     var imgob = edit.resources.images[name];
     if (imgob != undefined) {
         var img = imgob.img;
@@ -423,6 +431,13 @@ draw_thumb = function(name) {
         ctx.drawImage(img, 0, 0);
     }
 }
+clear_img_thumb = function() {
+    var thumb_can = $('#image-thumb');
+    var ctx = thumb_can[0].getContext('2d');
+    var w = parseInt(thumb_can.css('width'));
+    var h = parseInt(thumb_can.css('height'));
+    ctx.clearRect(0, 0, w, h);
+}
 $(document).on('click', '#btn-resources-images-back', function() {
     $('#shelf-resources-images').hide(200);
     $('#shelf-resources-all').show(200);
@@ -433,7 +448,11 @@ $(document).on('click', '#image-add-confirm', function() {
     edit.resources.add_img(name, {source: source}, function(success, err) {
         if (success) {
             notify('image "'+ name +'" added', 'success', 'resources-images');
-            draw_thumb(name);
+            $('#res-images-list > .big-list-item-selected').removeClass('big-list-item-selected');
+            $('#res-image-item-' + name).addClass('big-list-item-selected');
+            $('#image-add-path').val('');
+            $('#image-add-name').val('');
+            draw_img_thumb(name);
         } else {
             notify(err, 'danger', 'resources-images');
         }
@@ -443,7 +462,124 @@ $(document).on('click', '#res-images-list > .big-list-item', function() {
     var name = $(this).children('p').html();
     $('#res-images-list > .big-list-item-selected').removeClass('big-list-item-selected');
     $(this).addClass('big-list-item-selected');
-    draw_thumb(name);
+    draw_img_thumb(name);
 });
+$(document).on('click', '.btn-img-delete', function() {
+    var id = $(this).attr('id');
+    var name = id.substr(17, id.length);
+    edit.resources.remove_img(name);
+    clear_img_thumb();
+    notify('image removed', 'success', 'resources-images');
+});
+$(document).on('click', '.btn-img-refresh', function() {
+    var id = $(this).attr('id');
+    var name = id.substr(18, id.length);
+    edit.resources.refresh_img(name, function(success) {
+        if (success) {
+            notify('image refreshed successfully', 'success', 'resources-images');
+            draw_img_thumb(name);
+        } else {
+            notify('there was a problem refreshing the image', 'danger', 'resources-images');
+        }
+    });
+});
+/* resources: sprites */
+draw_sprite_thumb = function(name) {
+    var imgob = edit.resources.sprites[name];
+    if (imgob != undefined) {
+        var img = imgob.img;
+        var thumb_can = $('#sprite-thumb');
+        var ctx = thumb_can[0].getContext('2d');
+        thumb_can[0].width = thumb_can[0].width;
+        ctx.drawImage(img, 0, 0);
+        
+        var clips = imgob.ob.clips;
+        var dist_y = img.height/clips.y;
+        var dist_x = img.width/clips.x;
+        
+        
+        for (var i = 0; i <= clips.x; i++) {
+            ctx.moveTo(dist_x * i, 0);
+            ctx.lineTo(dist_x * i, img.height);
+        }
+        
+        for (var i = 0; i <= clips.y; i++) {
+            ctx.moveTo(0, dist_y * i);
+            ctx.lineTo(img.width, dist_y * i);
+        }
+        
+        ctx.strokeStyle = 'black';
+        ctx.linewidth = 1;
+        ctx.stroke();
+        ctx.stroke();
+    }
+}
+clear_sprite_thumb = function() {
+    var thumb_can = $('#sprite-thumb');
+    var ctx = thumb_can[0].getContext('2d');
+    var w = parseInt(thumb_can.css('width'));
+    var h = parseInt(thumb_can.css('height'));
+    ctx.clearRect(0, 0, w, h);
+}
+$(document).on('click', '#btn-resources-sprites-back', function() {
+    $('#shelf-resources-sprites').hide(200);
+    $('#shelf-resources-all').show(200);
+});
+$(document).on('click', '#sprite-add-confirm', function() {
+    var name = $('#sprite-add-name').val();
+    var source = $('#sprite-add-path').val();
+    var xclips = $('#sprite-add-xclips').val();
+    var yclips = $('#sprite-add-yclips').val();
+    
+    var opts = {
+        source: source,
+        clips: {x: xclips, y: yclips}
+    }
+    
+    edit.resources.add_sprite(name, opts, function(success, err) {
+        if (success) {
+            notify('sprite "'+ name +'" added', 'success', 'resources-sprites');
+            $('#res-sprites-list > .big-list-item-selected').removeClass('big-list-item-selected');
+            $('#res-sprites-item-' + name).addClass('big-list-item-selected');
+            $('#sprite-add-path').val('');
+            $('#sprite-add-name').val('');
+            $('#sprite-add-xclips').val('');
+            $('#sprite-add-yclips').val('');
+            draw_sprite_thumb(name);
+        } else {
+            notify(err, 'danger', 'resources-images');
+        }
+    });
+
+});
+$(document).on('click', '#res-sprites-list > .big-list-item', function() {
+    var name = $(this).children('p').html();
+    $('#res-sprites-list > .big-list-item-selected').removeClass('big-list-item-selected');
+    $(this).addClass('big-list-item-selected');
+    draw_sprite_thumb(name);
+});
+$(document).on('click', '.btn-sprite-delete', function() {
+    var id = $(this).attr('id');
+    var name = id.substr(18, id.length);
+    edit.resources.remove_sprite(name);
+    clear_sprite_thumb();
+    notify('sprite removed', 'success', 'resources-sprites');
+});
+$(document).on('click', '.btn-sprite-refresh', function() {
+    var id = $(this).attr('id');
+    var name = id.substr(19, id.length);
+    edit.resources.refresh_sprite(name, function(success) {
+        if (success) {
+            notify('sprite refreshed successfully', 'success', 'resources-sprites');
+            draw_sprite_thumb(name);
+        } else {
+            notify('there was a problem refreshing the sprite', 'danger', 'resources-sprites');
+        }
+    });
+});
+
+
+
+
 
 

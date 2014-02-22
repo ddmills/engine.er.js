@@ -314,8 +314,10 @@ var editor = function(scenario) {
         this.img.src = this.source + '?time=' + this.time;
         this.users = {};
     }
-    this.wrapper_image.prototype.refresh = function() {
+    this.wrapper_image.prototype.refresh = function(callback) {
         this.time = new Date().getTime();
+        this.img.onload = function() { callback ? callback(true) : null; }
+        this.img.onerror = function() { callback ? callback(false) : null; }
         this.img.src = this.source + '?time=' + this.time;
     }
     this.wrapper_image.prototype.remove = function() {
@@ -324,31 +326,74 @@ var editor = function(scenario) {
             users[user].notify_img_remove(this);
         }
         delete e.resources.images[this.name];
+        delete e.resources.ob.images[this.name];
         delete this;
     }
+    
+    
+    this.wrapper_sprite = function(name, ob, callback) {
+        this.name = name;
+        this.ob = ob;
+        this.source = ob.source;
+        this.time = new Date().getTime();
+        this.img = new Image();
+        var me = this;
+        this.img.onload = function() { 
+            e.resources.ob.sprites[name] = me.ob;
+            var opt = $("<div class='big-list-item' id='res-sprite-item-" + me.name + "'>" +
+                "<p class='big-list-item-title' id='title-res-sprite-" + me.name +  "'>" + me.name + "</p>" +
+                "<div class='btn-group big-list-item-controls'>" +
+                "<button title='delete' class='btn btn-default btn-xs btn-sprite-delete' id='btn-sprite-delete-" + me.name + "'><span class='glyphicon glyphicon-trash'></span></button>" +
+                "<button title='refresh' class='btn btn-default btn-xs btn-sprite-refresh' id='btn-sprite-refresh-" + me.name + "'><span class='glyphicon glyphicon-refresh'></span></button>" +
+                "</div></div>");
+                
+            $('#res-sprites-list').append(opt);
+            $('#sprite-thumbs').show(500);
+
+            callback ? callback(true) : null; 
+        }
+        this.img.onerror = function() { callback ? callback(false) : null; }
+        this.img.src = this.source + '?time=' + this.time;
+        this.users = {};
+    }
+    this.wrapper_sprite.prototype.refresh = function(callback) {
+        this.time = new Date().getTime();
+        this.img.onload = function() { callback ? callback(true) : null; }
+        this.img.onerror = function() { callback ? callback(false) : null; }
+        this.img.src = this.source + '?time=' + this.time;
+    }
+    this.wrapper_sprite.prototype.remove = function() {
+        $('#res-sprite-item-' + this.name).remove();
+        for (var user in this.users) {
+            users[user].notify_img_remove(this);
+        }
+        delete e.resources.sprites[this.name];
+        delete e.resources.ob.sprites[this.name];
+        delete this;
+    }
+    
     
     this.resources = {
         init: function() {
             this.ob = e.file.current_scenario.resources;
+            this.images = {};
+            this.sprites = {}
+            $('#res-images-list').html('');
+            $('#res-sprites-list').html('');
+            
             if (this.ob == undefined) {
                 e.file.current_scenario['resources'] = {
                     images: {},
                     sprites: {}
                 }
-                this.ob = e.file.current_scenario.layers;
+                this.ob = e.file.current_scenario.resources;
             }
-            this.sprites = {
-                'herp': 'test',
-                'derp': 'oogly',
-                'gurp': 'boogly',
-                'murp': 'pugly'
-            }
-            this.images = {};
-            for (var key in this.ob.images)
-                console.log(this.ob.images);
             
-            this.add_img(key, this.ob.images[key]);
+            for (var key in this.ob.images)
+                this.add_img(key, this.ob.images[key]);
 
+            for (var key in this.ob.sprites)
+                this.add_sprite(key, this.ob.sprites[key]);
         },
         add_img: function(name, options, callback) {
             if (this.images[name] == undefined) {
@@ -361,7 +406,41 @@ var editor = function(scenario) {
                     }
                 });
             } else {
-                callback ? callback(false, 'layer name "' + name + '" is already taken') : null;
+                callback ? callback(false, 'image name "' + name + '" is already taken') : null;
+            }
+        },
+        remove_img: function(name) {
+            if (this.images[name] != undefined) {
+                this.images[name].remove();
+            }
+        },
+        refresh_img: function(name, callback) {
+            if (this.images[name] != undefined) {
+                this.images[name].refresh(callback);
+            }
+        },
+        add_sprite: function(name, options, callback) {
+            if (this.sprites[name] == undefined) {
+                var sprite = new e.wrapper_sprite(name, options, function(success) {
+                    if (success) {
+                        e.resources.sprites[name] = sprite;
+                        callback ? callback(true, 'sprite added successfully') : null;
+                    } else {
+                        callback ? callback(false, 'sprite at "' + options.source + '" could not be loaded') : null;
+                    }
+                });
+            } else {
+                callback ? callback(false, 'sprite name "' + name + '" is already taken') : null;
+            }
+        },
+        remove_sprite: function(name) {
+            if (this.sprites[name] != undefined) {
+                this.sprites[name].remove();
+            }
+        },
+        refresh_sprite: function(name, callback) {
+            if (this.sprites[name] != undefined) {
+                this.sprites[name].refresh(callback);
             }
         }
     }

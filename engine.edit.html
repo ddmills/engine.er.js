@@ -9,6 +9,7 @@
     <script src='./js/bootstrap-select.min.js'></script>
     <script src='./js/simple-color-picker.min.js'></script>
     <script src='./js/lineage.min.js'></script>
+    <script src='./js/grid.min.js'></script>
     
     <!-- game engine script -->
     <script src='./engine.er.js'></script>
@@ -413,9 +414,31 @@
                             <span id='btn-resources-sprites-back' title='back to resources' class='btn-back glyphicon glyphicon-circle-arrow-left'></span>
                             <span class='glyphicon glyphicon-send'></span> sprites </h3>
                             <hr>
-                            <button type='button' class='btn btn-default' id='btn-resources-sprites-add'>
-                                <span class='glyphicon glyphicon-plus'></span> add sprite
-                            </button>
+                            <div class='well' id='sprites-thumbs'>
+                                <canvas id='sprite-thumb'></canvas>
+                                <div class='big-list' id='res-sprites-list'></div>
+                            </div>
+                            
+                            <div class='form-group well' id='add-sprite-form'>
+                                <h4> add sprite </h4>
+                                <label for='sprite-add-path'>image path</label>
+                                <input type='text' class='form-control' id='sprite-add-path' placeholder='./imgs/...'>
+                                <label for='sprite-add-name'>name</label>
+                                <input type='text' class='form-control' id='sprite-add-name' placeholder='name'>
+                                
+                                <label for='sprite-add-xclips'>x clips</label>
+                                <input type='text' title='number of sub-sprites in the x direction' class='form-control pos-int-only' id='sprite-add-xclips' placeholder='4'>
+                                
+                                <label for='sprite-add-yclips'>y clips</label>
+                                <input type='text' title='number of sub-sprites in the y direction' class='form-control pos-int-only' id='sprite-add-yclips' placeholder='4'>
+                                
+                                
+                                <button type='button' class='btn btn-default' id='sprite-add-confirm'>
+                                    <span class='glyphicon glyphicon-plus'></span> add
+                                </button>
+                            </div>
+                            
+                            
                         </div>
                     </div>
                     <div id='shelf-components' class='shelf-main'>
