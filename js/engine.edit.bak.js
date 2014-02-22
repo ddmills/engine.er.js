@@ -23,6 +23,7 @@ if (!Array.prototype.filter) {
         return res;
     };
 }
+
 Res_Image = function(name, source) {
     this.name = name;
     this.source = source;

@@ -131,7 +131,7 @@
                     <div id='editor-notify' style='position: absolute;' class='alert-area'></div>
                 </div>
             </div>
-            <div id='area-right'> 
+            <div id='area-right'>
                 <div id='area-editing-shelf'>
                     <ul class='nav nav-tabs'>
                         <li class='navtab active' id='goto-viewport' title='veiwport'><a><span class='glyphicon glyphicon-camera'></span> </a></li>
@@ -157,14 +157,8 @@
                             <hr>
                             <div id='layer-add-notify' class='alert-area'></div>
                             <div class='form-group well'>
-                            
-                                
-                            
                                 <label for='layer-add-form-name'>name</label>
                                 <input type='text' title='choose unique name' class='form-control' id='layer-add-form-name' value='name'>
-                                
-                                
-                                
                                 <label> size </label>
                                 <div class='well form-group-sub'>
                                     <div class='checkbox' title='layer will be the same size as the viewport'>
@@ -227,12 +221,7 @@
                                         <select id='layer-add-form-fillsprite-sprite' class='form-control' title='choose a sprite to fill the background - add sprites by going to the resources tab'> 
                                         </select>
                                     </div>
-                                    
                                 </div>
-                                
-                                
-                                
-                                
                                 <button type='button' class='btn btn-default' id='add-layer-cancel'>
                                     <span class='glyphicon glyphicon-remove'></span> cancel
                                 </button>
@@ -244,39 +233,75 @@
                         <div id='shelf-layer-edit'>
                             <h3 id='layer-edit-form-title'>
                             <span id='btn-layer-edit-back' title='back to layers' class='btn-back glyphicon glyphicon-circle-arrow-left'></span>
-                            <span class='glyphicon glyphicon-file'></span>edit layer</h3>
+                            <span class='glyphicon glyphicon-file'></span>edit layer: <div id='edit-layer-title-name'></div></h3>
                             <hr>
-                            <div id='layer-edit-err' class='alert-area'></div>
+                            <div id='layer-edit-notify' class='alert-area'></div>
                             <div class='form-group well'>
                                 <label for='layer-edit-form-name'>name</label>
-                                <input type='text' class='form-control' id='layer-edit-form-name' value='name'>
-                                
-                                <label for='layer-edit-form-width'>width</label>
-                                <input type='text' class='form-control int-only' id='layer-edit-form-width' value='500'>
-                                
-                                <label for='layer-edit-form-height'>height</label>
-                                <input type='text' class='form-control int-only' id='layer-edit-form-height' value='300'>
-                                
-                                <label for='layer-edit-form-left'>left</label>
-                                <input type='text' class='form-control int-only' id='layer-edit-form-left' value='0'>
-                                
-                                <label for='layer-edit-form-top'>top</label>
-                                <input type='text' class='form-control int-only' id='layer-edit-form-top' value='0'>
-                                
-                                <div class='checkbox'>
-                                    <label>
-                                        <input type='checkbox' id='layer-edit-form-overlay'>overlay
-                                        <p class='help-block'>layer is full size</p>
-                                    </label>
+                                <input type='text' title='choose unique name' class='form-control' id='layer-edit-form-name' value='name'>
+                                <label> size </label>
+                                <div class='well form-group-sub'>
+                                    <div class='checkbox' title='layer will be the same size as the viewport'>
+                                        <label>
+                                            <input type='checkbox' id='layer-edit-form-fullsize'>full size
+                                        </label>
+                                    </div>
+                                    
+                                    <div id='layer-edit-form-group-fullsize'>
+                                        <div class='form-inline'>
+                                            <label for='layer-edit-form-width'>width</label>
+                                            <input type='text' title='width of layer, in pixels' class='form-control pos-int-only' id='layer-edit-form-width' value='500'>
+                                        </div>
+                                        
+                                        <div class='form-inline'>
+                                            <label for='layer-edit-form-height'>height</label>
+                                            <input type='text' title='height of layer, in pixels' class='form-control pos-int-only' id='layer-edit-form-height' value='300'>
+                                        </div>
+                                        
+                                        <div class='form-inline'>
+                                            <label for='layer-edit-form-left'>left</label>
+                                            <input type='text' title='distance between left edge of viewport and left edge of layer, in pixels' class='form-control int-only' id='layer-edit-form-left' value='0'>
+                                        </div>
+                                        
+                                        <div class='form-inline'>
+                                            <label for='layer-edit-form-top'>top</label>
+                                            <input type='text' title='distance between top edge of viewport and top edge of layer, in pixels' class='form-control int-only' id='layer-edit-form-top' value='0'>
+                                        </div>
+                                    </div>
                                 </div>
-                                
-                                <div class='checkbox'>
-                                    <label>
-                                        <input type='checkbox' id='layer-edit-form-persistant'>refreshed
-                                        <p class='help-block'>layer is cleared whenever it's dirty</p>
-                                    </label>
+                                <label> refresh </label>
+                                <div class='well form-group-sub'>
+                                    <div class='checkbox' title='layer will be continually refreshed, ideal for sprites'>
+                                        <label>
+                                            <input type='checkbox' id='layer-edit-form-refresh'>refresh
+                                        </label>
+                                    </div>
+                                    <div class='form-inline' id='layer-edit-form-group-refresh'>
+                                        <label for='layer-edit-form-width'>refresh rate</label>
+                                        <input type='text' title='number of frames between refreshes' class='form-control pos-int-only' id='layer-edit-form-refreshrate' value='1'>
+                                    </div>
                                 </div>
-                                
+                                <label> viewport locked </label>
+                                <div class='well form-group-sub'>
+                                    <div class='checkbox' title='layer will move with the viewport, ideal for a gui'>
+                                        <label>
+                                            <input type='checkbox' id='layer-edit-form-locked'>lock to viewport
+                                        </label>
+                                    </div>
+                                </div>
+                                <label> tile map </label>
+                                <div class='well form-group-sub'>
+                                    <div class='checkbox' title='add a sprite map to this layer and generate a tile map'>
+                                        <label>
+                                            <input type='checkbox' id='layer-edit-form-fillsprite'>sprite fill
+                                        </label>
+                                    </div>
+                                    <div class='form-inline' id='layer-edit-form-group-fillsprite'>
+                                        <label>sprite</label>
+                                        <select id='layer-edit-form-fillsprite-sprite' class='form-control' title='choose a sprite to fill the background - add sprites by going to the resources tab'> 
+                                        </select>
+                                    </div>
+                                </div>
                                 <button type='button' class='btn btn-default' id='edit-layer-cancel'>
                                     <span class='glyphicon glyphicon-remove'></span> cancel
                                 </button>

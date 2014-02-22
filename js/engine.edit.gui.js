@@ -111,7 +111,7 @@ $(document).on('click', '#btn-file-saveas', function() {
     }
 });
 $(document).on('click', '#file-json-load', function() {
-    console.log('wait ' + $('#area-left').css('width'));
+    alert('feature isn\'t implemented');
 });
 $(document).on('click', '#btn-savejson', function() {
     $('#file-json-save-text').val(edit.file.get_json(edit.file.current_scenario, true));
@@ -188,6 +188,13 @@ $(document).on('click', '.btn-layer-delete', function() {
     if (r) {
         edit.layers.remove_layer(name);
     }
+});
+$(document).on('click', '.btn-layer-edit', function() {
+    var id = $(this).attr('id');
+    var name = id.substr(15, id.length);
+    layer_edit_form_set(name);
+    $('#shelf-layer-view').hide(200);
+    $('#shelf-layer-edit').show(200);
 });
 /* layers : add */
 layer_add_form_clear = function() {
@@ -280,4 +287,151 @@ $(document).on('click', '#add-layer-cancel', function() {
    $('#shelf-layer-add').hide(200);
    $('#shelf-layer-view').show(200);
 });
+/* layers: edit */
+layer_edit_form_set = function(name) {
+    var lay = edit.layers.layers[name];
+    
+    /* name */
+    $('#layer-edit-form-name').val(name);
+    $('#layer-edit-form-name').data('lay_name', name);
+    $('#edit-layer-title-name').html(name);
+    
+    $('#layer-edit-form-fillsprite-sprite').html('');
+    for (sprite in edit.resources.sprites) {
+        var ele = $('<option value="' + sprite + '">' + sprite + '</option>');
+        $('#layer-edit-form-fillsprite-sprite').append(ele);
+    }
+    
+    /* viewport locked */
+    if (lay.ob.locked) {
+        $('#layer-edit-form-locked').prop('checked', true);
+    } else {
+        $('#layer-edit-form-locked').removeAttr('checked');
+    }
+    
+    /* fillsprite */
+    if (lay.ob.fillsprite) {
+        $('#layer-edit-form-fillsprite').prop('checked', true);
+        $('#layer-edit-form-group-fillsprite').show();
+        $('#layer-edit-form-fillsprite-sprite option[value="' + lay.ob.fillsprite_name + '"]').attr('selected', 'selected');
+    } else {
+         $('#layer-edit-form-fillsprite').removeAttr('checked');
+        $('#layer-edit-form-group-fillsprite').hide();
+    }
+    
+    /* refresh */
+    if (lay.ob.refresh) {
+        $('#layer-edit-form-refresh').prop('checked', true);
+        $('#layer-edit-form-refreshrate').val(lay.ob.refresh_rate);
+        $('#layer-edit-form-group-refresh').show();
+    } else {
+        $('#layer-edit-form-refresh').removeAttr('checked');
+        $('#layer-edit-form-refreshrate').val('1');
+        $('#layer-edit-form-group-refresh').hide();
+    }
+    
+    /* size */
+    if (lay.ob.fullsize) {
+        $('#layer-edit-form-group-fullsize').hide();
+        $('#layer-edit-form-fullsize').prop('checked', true);
+    } else {
+        $('#layer-edit-form-group-fullsize').show();
+        $('#layer-edit-form-fullsize').removeAttr('checked');
+        $('#layer-edit-form-width').val(lay.ob.width);
+        $('#layer-edit-form-height').val(lay.ob.height);
+        $('#layer-edit-form-left').val(lay.ob.left);
+        $('#layer-edit-form-top').val(lay.ob.top);
+    }
+
+    $('#layer-edit-notify').html('');
+    
+}
+$(document).on('change', '#layer-edit-form-refresh', function() {
+    if (this.checked)
+        $('#layer-edit-form-group-refresh').show(100);
+    else
+        $('#layer-edit-form-group-refresh').hide(100);
+});
+$(document).on('change', '#layer-edit-form-fullsize', function() {
+    if (this.checked)
+        $('#layer-edit-form-group-fullsize').hide(100);
+    else
+        $('#layer-edit-form-group-fullsize').show(100);
+});
+$(document).on('change', '#layer-edit-form-fillsprite', function() {
+    if (this.checked)
+        $('#layer-edit-form-group-fillsprite').show(100);
+    else
+        $('#layer-edit-form-group-fillsprite').hide(100);
+});
+$(document).on('click', '#edit-layer-cancel', function() {
+   $('#shelf-layer-edit').hide(200);
+   $('#shelf-layer-view').show(200);
+});
+$(document).on('click', '#edit-layer-confirm', function() {
+   $('#shelf-layer-edit').hide(200);
+   
+    var name = $('#layer-edit-form-name').val();
+    var old_name = $('#layer-edit-form-name').data('lay_name');
+   
+   var opts = {};
+    opts.fullsize = $('#layer-edit-form-fullsize').is(':checked');
+    opts.refresh = $('#layer-edit-form-refresh').is(':checked');
+    opts.locked = $('#layer-edit-form-locked').is(':checked');
+    opts.fillsprite = $('#layer-edit-form-fillsprite').is(':checked');
+    
+    if (opts.fillsprite)
+        opts.fillsprite_name = $('#layer-edit-form-fillsprite-sprite').val();
+    
+    if (opts.refresh)
+        opts.refresh_rate = $('#layer-edit-form-refreshrate').val();
+        
+    if (!opts.fullsize) {
+        opts.width = $('#layer-edit-form-width').val();
+        opts.height =$('#layer-edit-form-height').val();
+        opts.left = $('#layer-edit-form-left').val();
+        opts.top = $('#layer-edit-form-top').val();
+    }
+    
+    opts.z = edit.layers.length;
+    
+    edit.layers.edit(old_name, name, opts);
+
+    $('#shelf-layer-edit').hide(200);
+    $('#shelf-layer-view').show(200, function() {
+        notify('layer "' + name + '" edited', 'success', 'layer-view');
+    });
+
+});
+
+/* resources */
+$(document).on('click', '#btn-resources-images', function() {
+    $('#shelf-resources-all').hide(200);
+    $('#shelf-resources-images').show(200);
+});
+$(document).on('click', '#btn-resources-images-back', function() {
+    $('#shelf-resources-images').hide(200);
+    $('#shelf-resources-all').show(200);
+});
+$(document).on('click', '#image-add-confirm', function() {
+    var source = $('#image-add-path').val()
+    var name = $('#image-add-name').val()
+    
+    if (edit.resources.images[name] != null) {
+        notify('there is already an image named "' + name + '"', 'danger', 'resources-images');
+    } else {
+        edit.resources.add_img(name, source, function(success) {
+            if (success) {
+                notify('image "'+ name +'" added', 'success', 'resources-images');
+            } else {
+                notify('image at "' + source + '" could not be loaded', 'danger', 'resources-images');
+            }
+        });
+    }
+});
+
+
+
+
+
 

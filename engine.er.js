@@ -1,17 +1,26 @@
 
 var eng = function(id, scenario) {
     var g = this;
-    var g_div = $('#' + id);
-    this.running = false;
-    this.paused = false;
+    this.ele = $('#' + id);
+    this.z = this.ele.css('z-index');
+    
+    this.state = {
+        running: false,
+        paused: false,
+        started: false,
+        loading: null
+    }
+    
     this.hooks = [];
+    
     this.stats = {
         ms: null,
         time: null
-    },
+    }
+    
     this.constants = {
         GAME_SPEED: 1
-    },
+    }
     
     /* viewport defines the bounds of the game */
     this.viewport = {
@@ -20,18 +29,30 @@ var eng = function(id, scenario) {
             this.width = 640;
             this.height = 480;
             this.background = null;
+            
             for (k in ob) {
                 this[k] = ob[k];
             }
             
-            g_div.css('background', 'blue');
-            g_div.css('width', this.width);
-            g_div.css('height', this.height);
+            this.ele = $('<div id="_eng_viewport"></div>');
+            
+            this.ele.css('background', this.background);
+            this.ele.css('width', this.width);
+            this.ele.css('height', this.height);
+            this.ele.css('display', 'block');
+            this.ele.css('left', '0px');
+            this.ele.css('top', '0px');
+            this.ele.css('position', 'relative');
+            this.ele.css('overflow', 'hidden');
+            
+           
+            
             this.__ready = true;
             callback();
         },
         start: function() {
             console.log('starting viewport');
+            g.ele.append(this.ele);
         }
     }
     
@@ -42,17 +63,65 @@ var eng = function(id, scenario) {
             setTimeout(function() {
                 g.resources.__ready = true;
                 callback();
-            }, 2500);
+            }, 200);
         }, 
         start: function() {
             console.log('starting resources');  
         }
     }
     
+    this.layers = {};
+    
+    this.layer = function(name, ob) {
+        this.name = name;
+        for (var k in ob)
+            this[k] = ob[k];
+        
+        if (this.fullsize) {
+            this.width = g.viewport.width;
+            this.height = g.viewport.height;
+            this.left = 0;
+            this.top = 0;
+        }
+        
+        this.ele = $('<canvas id="_eng_canvas_' + name + '" class="_eng_canvas">');
+        this.canvas = this.ele[0];
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
+        this.context = this.canvas.getContext('2d');
+        this.context.rect(0, 0, this.width, this.height);
+        this.context.stroke();
+
+        this.ele.css('position', 'absolute');
+        this.ele.css('left', this.left + 'px');
+        this.ele.css('top', this.top + 'px');
+        this.ele.css('z-index', this.z);
+    }  
+    this.layer.prototype.start = function() {
+        g.viewport.ele.append(this.ele);
+    }   
+    
+    this.layers_proxy = {
+        init: function(ob, callback) {
+            for(var k in ob)
+                g.layers[k] = new g.layer(k, ob[k]);
+            
+            console.log(g.layers);
+            this.__ready = true;
+            callback();
+        },
+        start: function() {
+            for (var lay in g.layers)
+                g.layers[lay].start();
+        }
+    }
+    
+    /* called when a manager is ready */
     this.__ready = function(callback) {
         if (g.viewport.__ready &&
-            g.resources.__ready) {
-            this.loading = false;
+            g.resources.__ready &&
+            g.layers_proxy.__ready) {
+            g.state.loading = false;
             if (callback)
                 callback();
             return true;
@@ -62,7 +131,7 @@ var eng = function(id, scenario) {
     
     /* called at game creation */
     this.initialize = function(callback) {
-        this.loading = true;
+        this.state.loading = true;
         var cb = callback;
         this.viewport.init(scenario.viewport, function() {
             g.__ready(cb);
@@ -70,21 +139,24 @@ var eng = function(id, scenario) {
         this.resources.init(scenario.resources, function() {
             g.__ready(cb);
         });
+        this.layers_proxy.init(scenario.layers, function() {
+            g.__ready(cb);
+        });
     }
     
     /* starts the game clock and begins update() */
     this.start = function(callback) {
-        if(g.__ready() && !g.running) {
+        if (g.__ready() && !g.state.running) {
             /* set time info */
             var d = new Date(); 
             g.time = d.getTime();
             g.time_started = g.time;
             g.viewport.start();
             g.resources.start();
-            g.running = true;
+            g.layers_proxy.start();
+            g.state.started = true;
             g.update();
-            if (callback)
-                callback();
+            callback ? callback(): null;
             return true;
         }
         return false;
@@ -99,8 +171,9 @@ var eng = function(id, scenario) {
         return false;
     }
     
+    /* main game loop */
     this.update = function() {
-        if (g.running && !g.paused) {
+        if (g.state.started && !g.state.paused) {
             var now = new Date().getTime();
             g.stats.ms = (now - (g.stats.time || now));
             var delta = g.stats.ms * g.constants.GAME_SPEED;
@@ -108,11 +181,13 @@ var eng = function(id, scenario) {
             for (hook in g.hooks)
                 g.hooks[hook](delta);
             requestAnimationFrame(function() { g.update() });
+            
         }
     }
     
+    /* stop the game */
     this.stop = function() {
-        this.running = false;
+        g.state.started = false;
         delete this;
     }
 }

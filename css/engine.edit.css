@@ -268,6 +268,11 @@ display: none;
     display: none;
 }
 
+/* edit layer shelf */
+#edit-layer-title-name {
+    display: inline;
+}
+
 /* add component form */
 .comp-disptype {
     display: none;

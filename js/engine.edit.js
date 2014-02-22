@@ -37,8 +37,7 @@ var editor = function(scenario) {
         var most_right = view_w;
         var most_top = 0
         var most_bottom = view_h;
-
-        
+    
         for (layer in e.layers) {
             var layer = e.layers[layer];
             var w = parseInt(layer.width);
@@ -315,6 +314,23 @@ var editor = function(scenario) {
         
     }
 
+    this.wrapper_image = function(name, ob, callback) {
+        this.name = name;
+        this.ob = ob;
+        this.source = ob.source;
+        this.time = new Date().getTime();
+        this.img = new Image();
+        var me = this;
+        this.img.onload = function() { callback(true); }
+        this.img.onerror = function() { callback(false); }
+        this.img.src = this.source + '?time=' + this.time;
+        this.users = {};
+    }
+    this.wrapper_image.prototype.refresh = function() {
+        this.time = new Date().getTime();
+        this.img.src = this.source + '?time=' + this.time;
+    }
+    
     this.resources = {
         init: function() {
             this.sprites = {
@@ -323,10 +339,28 @@ var editor = function(scenario) {
                 'gurp': 'boogly',
                 'murp': 'pugly'
             }
+            e.file.current_scenario['resources'] = {
+                images: {},
+                sprites: {}
+            }
+            this.images = {};
         },
-    
+        add_img: function(name, source, callback) {
+            e.file.current_scenario.resources.images[name] = {source: source};
+            var ob = e.file.current_scenario.resources.images[name];
+            var img = new e.wrapper_image(name, ob, function(success) {
+                if (success) {
+                    e.resources.images[name] = img;
+                } else {
+                    
+                }
+                callback(success);
+            });
+        }
     }
     
+    
+
     this.wrapper_layer = function(name, opts) {
         e.file.current_scenario.layers[name] = opts;
         this.ob = e.file.current_scenario.layers[name];
@@ -357,6 +391,79 @@ var editor = function(scenario) {
         this.set_z(opts.z);
         this.update_view();
     }
+    this.wrapper_layer.prototype.edit = function(name, options) {
+        if (name != this.name)
+            this.set_name(name);
+            
+        if (options.fullsize != this.ob.fullsize) {
+            this.resize(options);
+        } else if (options.width != this.ob.width || options.height != this.ob.height) {
+            this.resize(options);
+        }
+        
+        if (options.refresh && this.ob.refresh) {
+            this.ob.refresh_rate = options.refresh_rate;
+        } else if (this.ob.refresh && !options.refresh) {
+            this.ob.refresh = false;
+            delete this.ob.refresh_rate;
+        } else if (!this.ob.refresh && options.refresh) {
+            this.ob.refresh = options.refresh;
+            this.ob.refresh_rate = options.refresh_rate;
+        }
+        
+        
+        if (options.locked != this.ob.locked) {
+            if (!options.locked) {
+                delete this.ob.locked;
+            } else {
+                this.ob.locked = true;
+            }
+        }
+        
+        if (options.left != this.ob.left || options.top != this.ob.top)
+            this.set_position(options);
+        
+        if (options.fillsprite && !this.ob.fillsprite) {
+            this.ob.fillsprite = true;
+            this.ob.fillsprite_name = options.fillsprite_name;
+            this.ob.fillsprite_map = this.generate_fillsprite_map();
+        }
+        
+        if (this.ob.fillsprite && !options.fillsprite) {
+            delete this.ob.fillsprite;
+            delete this.ob.fillsprite_name;
+            delete this.ob.fillsprite_map;
+        }
+        
+        if (this.ob.fillsprite && options.fillsprite) {
+            if (this.ob.fillsprite_name != options.fillsprite_name) {
+                this.ob.fillsprite_name = options.fillsprite_name;
+            }
+        }
+    }
+    this.wrapper_layer.prototype.generate_fillsprite_map = function() {
+        return [0, 0, 0, 0, 0, 0, 0];
+    }
+    this.wrapper_layer.prototype.set_name = function(name) {
+        e.file.current_scenario.layers[name] = e.file.current_scenario.layers[this.name];
+        delete e.file.current_scenario.layers[this.name];
+        this.ob = e.file.current_scenario.layers[name];
+        this.name = name;
+        this.ele_list_div.attr('id', 'layer-view-' + this.name);
+        this.ele_list_div.html("<p class='big-list-item-title' id='title-layer-edit-" + this.name +  "'>" + this.name + "</p>" +
+            "<div class='btn-group big-list-item-controls'>" +
+                "<button title='show or hide' type='button' class='btn btn-default btn-xs btn-layer-vis' id='btn-layer-vis-"+ this.name +"'><span class='glyphicon glyphicon-eye-open'></span></button>" +
+                "<button title='edit properties' type='button' class='btn btn-default btn-xs btn-layer-edit' id='btn-layer-edit-"+ this.name +"'><span class='glyphicon glyphicon-pencil'></span></button>" +
+                "<button title='delete' type='button' class='btn btn-default btn-xs btn-layer-delete' id='btn-layer-delete-"+ this.name +"'><span class='glyphicon glyphicon-trash'></span></button>" +
+                "<button title='move up' type='button' class='btn btn-default btn-xs btn-layer-up' id='btn-layer-up-"+ this.name +"'><span class='glyphicon glyphicon-chevron-up'></span></button>" +
+                "<button title='move down' type='button' class='btn btn-default btn-xs btn-layer-down' id='btn-layer-down-"+ this.name +"'><span class='glyphicon glyphicon-chevron-down'></span></button>" +
+            "</div>");
+        this.canvas.attr('id', 'editor-canvas-"' + this.name);
+        this.ele_container_div.attr('id', 'editor-layer-container-"' + this.name);
+        this.ele_content_div.attr('id', 'layer-contents-' + this.name);
+        this.ele_text_div.html(this.name);
+        
+    }
     this.wrapper_layer.prototype.set_visibility = function(visibility) {
         this.visible = visibility;
         if (this.visible) {
@@ -384,6 +491,11 @@ var editor = function(scenario) {
         this.ele_container_div.css('top', d.top + 'px');
         
         this.set_visibility(this.visible);
+    }
+    this.wrapper_layer.prototype.set_position = function(pos) {
+        this.ob.left = pos.left;
+        this.ob.top = pos.top;
+        this.update_view();
     }
     this.wrapper_layer.prototype.get_dimensions = function() {
         var d = {}
@@ -419,7 +531,6 @@ var editor = function(scenario) {
         return true;
     }
     this.wrapper_layer.prototype.set_z = function(order) {
-        console.log('changing z: ' + order);
         this.order = order;
         this.ob['z'] = order;
         this.z_order = 100 - this.order;
@@ -429,9 +540,15 @@ var editor = function(scenario) {
         $('#layer-list').append(this.ele_list_div);
     }
     this.wrapper_layer.prototype.resize = function(size) {
-        if (!this.ob.fullsize) {
-            this.ob.width = size.width;
-            this.ob.height = size.height;
+        if (size.fullsize == undefined || !size.fullsize) {
+            if (!this.ob.fullsize) {
+                this.ob.width = size.width;
+                this.ob.height = size.height;
+            }
+        } else {
+            this.fullsize = true;
+            delete this.ob.width;
+            delete this.ob.height;
         }
         this.update_view();
     }
@@ -485,14 +602,19 @@ var editor = function(scenario) {
             }
             return {'added': false, 'error': 'layer name "' + name + '" is already taken'};
         },
+        edit: function(old_name, name, options) {
+            this.layers[old_name].edit(name, options);
+        },
         select: function(name) {
-            $('#layer-list > .big-list-item-selected').removeClass('big-list-item-selected');
-            $('.editor-layer-container-selected').removeClass('editor-layer-container-selected');
-            $('.editor-layer-text-selected').removeClass('editor-layer-text-selected');
-            $('#editor-layer-container-' + name).addClass('editor-layer-container-selected');
-            $('#layer-view-' + name).addClass('big-list-item-selected');
-            layer = this.layers[name].ele_text_div.addClass('editor-layer-text-selected');
-            this.selected_layer = layer;
+            if (this.layers[name] != undefined) {
+                $('#layer-list > .big-list-item-selected').removeClass('big-list-item-selected');
+                $('.editor-layer-container-selected').removeClass('editor-layer-container-selected');
+                $('.editor-layer-text-selected').removeClass('editor-layer-text-selected');
+                $('#editor-layer-container-' + name).addClass('editor-layer-container-selected');
+                $('#layer-view-' + name).addClass('big-list-item-selected');
+                layer = this.layers[name].ele_text_div.addClass('editor-layer-text-selected');
+                this.selected_layer = layer;
+            }
         },
         get_order: function() {
             var order = [];
