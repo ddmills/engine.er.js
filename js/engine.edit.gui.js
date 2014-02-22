@@ -62,6 +62,58 @@ $(document).on('click', '.navtab', function() {
     }
 });
 
+/* editor window */
+var vis = false;
+var pan = false;
+
+var pan_start = {x: 0, y: 0};
+var editor_start = {x: parseInt($('#editor').css('left')), y: parseInt($('#editor').css('top'))};
+var mouse = {x: 0, y: 0};
+
+
+$(document).mousemove(function(e) {
+    mouse.x = e.pageX;
+    mouse.y = e.pageY;
+    
+    if (pan) {
+        var l = editor_start.x + (mouse.x - pan_start.x);
+        var t = editor_start.y + (mouse.y - pan_start.y);
+        $('#editor').css('left', l);
+        $('#editor').css('top',t);
+    }
+    
+});
+
+$(document).keyup(function(evt) {
+    if (evt.keyCode == 32) {
+        vis = false;
+        $('#editor-modal').hide(25);
+    }
+});
+$(document).keydown(function(evt) {
+    if (evt.keyCode == 32) {
+        if (vis == false) {
+            $('#editor-modal').css('left', mouse.x + 5); 
+            $('#editor-modal').css('top', mouse.y - 25)
+            $('#editor-modal').show(250);
+            vis = true;
+        }
+    }
+});
+$(document).mousedown(function(evt) {
+
+    if (evt.which == 3) {
+        pan = true;
+        pan_start.x = evt.pageX;
+        pan_start.y = evt.pageY;
+        editor_start = {x: parseInt($('#editor').css('left')), y: parseInt($('#editor').css('top'))};
+    }
+}).on('contextmenu', function(e){  e.preventDefault(); });;
+$(document).mouseup(function(evt) {
+    if (evt.which == 3) {
+        pan = false;
+    }
+});
 /* file controls */
 $(document).on('click', '#btn-save', function() {
     $('#save-modal').modal('show');
