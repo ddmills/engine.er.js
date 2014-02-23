@@ -147,6 +147,23 @@ var editor = function(scenario) {
             return JSON.stringify(scenario);
         }
     },
+    
+    this.get_grid = function(w, h, color) {
+        var can = $('#canvas-create-grid');
+        var ctx = can[0].getContext('2d');
+        can.attr('width', w);
+        can.attr('height', h);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(w, 0);
+        ctx.lineTo(w, h);
+        ctx.lineTo(0, h);
+        ctx.stroke();
+        return dataURL = can[0].toDataURL();
+    }
+    
+    
     this.viewport = {
         init: function() {
             this.grid_width = 16;
@@ -173,28 +190,13 @@ var editor = function(scenario) {
             this.ob.background = background;
             this.reset_view();
         },
-        draw_grid : function() {
-            var can = $('#canvas-create-grid');
-            var ctx = can[0].getContext('2d');
-            can.attr('width', this.grid_width);
-            can.attr('height', this.grid_height);
-            ctx.strokeStyle = this.grid_color;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(this.grid_width, 0);
-            ctx.lineTo(this.grid_width, this.grid_height);
-            ctx.lineTo(0, this.grid_height);
-            ctx.stroke();
-            var dataURL = can[0].toDataURL();
-            this.ele.css('background-image', 'url(' + dataURL +')');
-        },
         reset_view: function(fade) {
             if (fade)
                 this.ele.css('opacity', 0);
             this.ele.css('width', this.ob.width);
             this.ele.css('height', this.ob.height);
             this.ele.css('background', this.ob.background);
-            this.draw_grid();
+            //this.draw_grid();
             if (fade)
                 this.ele.fadeTo(1000, 1);
             e.resize();
@@ -349,7 +351,9 @@ var editor = function(scenario) {
                 
             $('#res-sprites-list').append(opt);
             $('#sprite-thumbs').show(500);
-
+            
+            me.size = {w: this.width/me.ob.clips.x, h: this.height/me.ob.clips.y};
+            
             callback ? callback(true) : null; 
         }
         this.img.onerror = function() { callback ? callback(false) : null; }
@@ -470,6 +474,8 @@ var editor = function(scenario) {
         this.ele_container_div.append(this.ele_content_div);
         this.ele_container_div.append(this.ele_text_div);
         
+        this.ele_container_div.css('background-repeat', 'repeat');
+        
         $('#editor-viewport').append(this.ele_container_div);
         $('#layer-list').append(this.ele_list_div);
         this.set_z(opts.z);
@@ -524,6 +530,8 @@ var editor = function(scenario) {
                 this.ob.fillsprite_name = options.fillsprite_name;
             }
         }
+        
+        this.update_view();
     }
     this.wrapper_layer.prototype.generate_fillsprite_map = function() {
         return [0, 0, 0, 0, 0, 0, 0];
@@ -564,7 +572,7 @@ var editor = function(scenario) {
     }
     this.wrapper_layer.prototype.update_view = function() {
         var d = this.get_dimensions();
-
+        
         this.canvas.attr('width', d.width);
         this.canvas.attr('height', d.height);
     
@@ -573,6 +581,16 @@ var editor = function(scenario) {
         
         this.ele_container_div.css('left', d.left + 'px');
         this.ele_container_div.css('top', d.top + 'px');
+        
+
+       
+        if (e.layers.selected_layer === this) {
+            this.select();
+        }
+        
+        if (!this.ob.fillsprite) {
+            this.ele_container_div.css('background-image', '');
+        }
         
         this.set_visibility(this.visible);
     }
@@ -655,6 +673,18 @@ var editor = function(scenario) {
         delete e.file.current_scenario.layers[this.name];
         delete this;
     }
+    this.wrapper_layer.prototype.select = function() {
+        if (this.ob.fillsprite) {
+            if (this.grid_img == undefined) {
+                var sprite = e.resources.sprites[this.ob.fillsprite_name];
+                this.grid_img = e.get_grid(sprite.size.w, sprite.size.h, 'black');
+            }
+            this.ele_container_div.css('background-image', 'url(' + this.grid_img +')');
+        }
+    }
+    this.wrapper_layer.prototype.deselect = function() {
+        this.ele_container_div.css('background-image', '');
+    }
     
     this.layers = {
         init: function() {
@@ -693,8 +723,13 @@ var editor = function(scenario) {
                 $('.editor-layer-text-selected').removeClass('editor-layer-text-selected');
                 $('#editor-layer-container-' + name).addClass('editor-layer-container-selected');
                 $('#layer-view-' + name).addClass('big-list-item-selected');
-                layer = this.layers[name].ele_text_div.addClass('editor-layer-text-selected');
+                layer = this.layers[name];
+                layer.ele_text_div.addClass('editor-layer-text-selected');
+                if (this.selected_layer != '')
+                    this.selected_layer.deselect();
+                
                 this.selected_layer = layer;
+                this.selected_layer.select();
             }
         },
         get_order: function() {

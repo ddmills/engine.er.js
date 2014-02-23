@@ -69,8 +69,8 @@ var pan = false;
 var pan_start = {x: 0, y: 0};
 var editor_start = {x: parseInt($('#editor').css('left')), y: parseInt($('#editor').css('top'))};
 var mouse = {x: 0, y: 0};
-
-
+var editor_size = {w: parseInt($('#editor').css('width')), h: parseInt($('#editor').css('height'))};
+var view_size = {w: parseInt($('#editor-viewport').css('width')), h: parseInt($('#editor-viewport').css('width'))};
 $(document).mousemove(function(e) {
     mouse.x = e.pageX;
     mouse.y = e.pageY;
@@ -78,7 +78,10 @@ $(document).mousemove(function(e) {
     if (pan) {
         var l = editor_start.x + (mouse.x - pan_start.x);
         var t = editor_start.y + (mouse.y - pan_start.y);
+        //if (l <= 0 && l >= max_pos.x)
         $('#editor').css('left', l);
+        
+        //if (t <= 0 && t >= max_pos.y)
         $('#editor').css('top',t);
     }
     
@@ -100,15 +103,21 @@ $(document).keydown(function(evt) {
         }
     }
 });
-$(document).mousedown(function(evt) {
-
+$(document).on('mousedown', '#area-left', function(evt) {
     if (evt.which == 3) {
         pan = true;
+        editor_size = {w: parseInt($('#editor').css('width')), h: parseInt($('#editor').css('height'))};
+        view_size = {w: parseInt($('#area-left').css('width')), h: parseInt($('#area-left').css('width'))};
+        max_pos = {x: -1 * (editor_size.w - view_size.w), y: -1 * (editor_size.h - view_size.h)};
         pan_start.x = evt.pageX;
         pan_start.y = evt.pageY;
         editor_start = {x: parseInt($('#editor').css('left')), y: parseInt($('#editor').css('top'))};
     }
-}).on('contextmenu', function(e){  e.preventDefault(); });;
+})
+$(document).on('contextmenu', '#area-left', function(evt) { 
+    evt.preventDefault()
+});
+
 $(document).mouseup(function(evt) {
     if (evt.which == 3) {
         pan = false;
@@ -469,7 +478,6 @@ $(document).on('click', '#btn-resources-sprites', function() {
     $('#shelf-resources-all').hide(200);
     $('#shelf-resources-sprites').show(200);
 });
-
 /* resources: images */
 draw_img_thumb = function(name) {
     var imgob = edit.resources.images[name];
